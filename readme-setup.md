@@ -28,7 +28,7 @@ Data lives in Netlify Database. Its tables are created and updated automatically
 
    Changing either value signs everyone out, so they'd need the code again.
 3. **Form emails.** Forms > Form notifications > Email notification for `booking`, `contact` and `toolkit-access`, sent to the address that should receive them.
-4. **Domain.** Domain management > Add a domain > zerocostvisibility.com, then make it the primary domain so the netlify.app address redirects to it.
+4. **Domain (later).** The site currently uses https://zerocostvisibility.netlify.app everywhere: canonical URLs, link previews, sitemap, robots.txt and the business details. Once you buy a domain, add it under Domain management and make it the primary domain. Then ask Claude to switch those addresses over, and add the new domain to the GA4 data stream and Search Console.
 
 ## Booking: built-in calendar, Calendly or Cal.com
 The Book page uses the built-in calendar until a scheduler link is set in `site/assets/config.js`.
@@ -53,7 +53,7 @@ The Book page uses the built-in calendar until a scheduler link is set in `site/
    | `contact_click` | Phone or email link tapped | `method` |
 
    Scans from each QR code show up in Acquisition > Traffic acquisition under campaign `starpower2026`. The content dimension is `closing-slide` or `slide14`.
-4. **Search Console:** search.google.com/search-console > Add property > Domain > zerocostvisibility.com, then add the TXT record it gives you at your domain registrar. Then go to Sitemaps and submit `sitemap.xml`. (The other option, a verification `<meta>` tag, has a marked spot in `site/index.html`.)
+4. **Search Console:** while the site is on netlify.app, use Add property > **URL prefix** > `https://zerocostvisibility.netlify.app/`, verified with the HTML tag method: paste the `<meta>` tag at the marked spot in `site/index.html`. Then go to Sitemaps and submit `sitemap.xml`. Once you own a domain, add it as a Domain property and verify it with a DNS TXT record.
 
 ## Who opened the toolkit
 Netlify > Database > `toolkit_access` lists every email that entered the right code, with the QR code it came from. The same people also appear under Forms > `toolkit-access`.
