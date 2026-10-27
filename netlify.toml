@@ -1,0 +1,30 @@
+[build]
+  publish = "site"
+
+[[redirects]]
+  from = "/toolkit"
+  to = "/toolkit/"
+  status = 301
+
+# Short links printed as QR codes in Liz's deck (UTM tags show which slide drove the scan)
+[[redirects]]
+  from = "/starpower"
+  to = "/toolkit/?utm_source=starpower&utm_medium=qr&utm_campaign=starpower2026&utm_content=closing-slide"
+  status = 302
+
+[[redirects]]
+  from = "/reviews"
+  to = "/toolkit/?utm_source=starpower&utm_medium=qr&utm_campaign=starpower2026&utm_content=slide14#step3"
+  status = 302
+
+[[headers]]
+  for = "/*"
+  [headers.values]
+    X-Content-Type-Options = "nosniff"
+    Referrer-Policy = "strict-origin-when-cross-origin"
+    X-Frame-Options = "SAMEORIGIN"
+
+[[headers]]
+  for = "/assets/*"
+  [headers.values]
+    Cache-Control = "public, max-age=604800"

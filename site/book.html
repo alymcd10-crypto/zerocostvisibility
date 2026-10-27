@@ -1,0 +1,126 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Book a Session | Liz Turnbaugh Federman</title>
+<meta name="description" content="Book a 60-minute 1:1 session with Liz Turnbaugh Federman: a close look at your business and a 90-day plan for your market.">
+
+<meta property="og:title" content="Book a Session | Liz Turnbaugh Federman">
+<meta property="og:description" content="Book a 60-minute 1:1 session with Liz Turnbaugh Federman: a close look at your business and a 90-day plan for your market.">
+<meta property="og:image" content="https://zerocostvisibility.com/assets/img/hero-liz.jpg">
+<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,500;0,600;1,500&family=Libre+Franklin:wght@400;500;600&display=swap">
+<link rel="stylesheet" href="assets/site.css">
+</head>
+<body>
+<a class="sr-only" href="#main">Skip to content</a>
+<header class="site-header">
+  <div class="wrap">
+    <a class="brand" href="/" aria-label="Liz Turnbaugh Federman, home">
+      <span class="brand-name">LIZ</span><span class="brand-rule" aria-hidden="true"></span>
+      <span class="brand-tag">Coaching for agents</span>
+    </a>
+    <nav class="nav" aria-label="Main">
+      <a href="/#method">How it works</a>
+      <a href="/book" aria-current="page">Coaching</a>
+      <a href="/book#contact">Contact</a>
+      <a class="access" href="/toolkit/"><svg aria-hidden="true" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="4" y="11" width="16" height="10" rx="2"></rect><path d="M8 11V7a4 4 0 0 1 8 0v4"></path></svg> Attendee access</a>
+    </nav>
+  </div>
+</header>
+<main id="main">
+<section class="book" aria-labelledby="book-title">
+  <div class="wrap">
+    <div class="book-copy">
+      <p class="eyebrow">1:1 coaching session</p>
+      <h1 id="book-title">An hour on <em>your</em> business.</h1>
+      <p class="lede">We look at where your business comes from today and pick the few changes that will matter most in your market. You leave with a 90-day plan you can actually run.</p>
+      <h2 style="font-size:24px;font-weight:600">What we cover</h2>
+      <ul class="covers-list">
+        <li><strong>Where your business comes from.</strong> Your last year of closings, what's bringing people to you and what isn't.</li>
+        <li><strong>How you show up.</strong> What someone finds when they look you up, on review sites and in AI search.</li>
+        <li><strong>Your 90-day plan.</strong> The few changes that matter most in your market, written out week by week.</li>
+      </ul>
+      <dl class="details" aria-label="Session details">
+        <dt>Length</dt><dd>60 minutes</dd>
+        <dt>Where</dt><dd>Zoom</dd>
+        <dt>Price</dt><dd>$297 for the first 10 sessions, then $397</dd>
+      </dl>
+    </div>
+
+    <div class="booking" aria-labelledby="booking-title">
+      <h2 id="booking-title" style="font-size:30px">Pick a time</h2>
+      <div id="cal-inline" class="booking-embed"></div>
+      <div id="booker" class="booker">
+        <div class="booker-picker">
+          <div class="cal-head">
+            <button class="cal-nav" type="button" data-cal="prev" aria-label="Previous month">&#8249;</button>
+            <h3 class="cal-month" aria-live="polite">&nbsp;</h3>
+            <button class="cal-nav" type="button" data-cal="next" aria-label="Next month">&#8250;</button>
+          </div>
+          <p class="cal-tz">60 minutes on Zoom. All times are Central Time.</p>
+          <div class="cal-grid" aria-label="Available days"></div>
+          <div class="slots">
+            <p class="slots-day" aria-live="polite">Pick a day</p>
+            <div class="slot-list" aria-label="Available times"></div>
+          </div>
+        </div>
+        <form id="booking-form" class="booking-form" name="booking" method="POST" action="/thanks.html" data-netlify="true" netlify-honeypot="company-website" hidden>
+          <input type="hidden" name="form-name" value="booking">
+          <input type="hidden" name="session-date">
+          <input type="hidden" name="session-time">
+          <p class="sr-only"><label for="b-hp">Leave this empty</label><input id="b-hp" name="company-website" tabindex="-1" autocomplete="off"></p>
+          <p class="full booking-pick">Requesting <strong id="booking-pick"></strong></p>
+          <label class="field" for="b-name">Name<input id="b-name" name="name" type="text" autocomplete="name" required></label>
+          <label class="field" for="b-email">Email<input id="b-email" name="email" type="email" autocomplete="email" required></label>
+          <label class="field full" for="b-market">Brokerage and town (optional)<input id="b-market" name="market" type="text" placeholder="Compass, Lake Forest"></label>
+          <div class="full"><button class="btn" type="submit">Request this time <span aria-hidden="true">&rarr;</span></button></div>
+        </form>
+        <p id="booking-status" class="success" role="status" hidden></p>
+      </div>
+      <p class="form-note">Liz confirms every request by email with your Zoom link and payment details. None of these times work? <a href="#contact">Send a note</a> with a few that do.</p>
+    </div>
+  </div>
+</section>
+
+<section class="contact" id="contact" aria-labelledby="contact-title">
+  <div class="wrap">
+    <div class="contact-copy">
+      <h2 id="contact-title">Send a note</h2>
+      <p>Tell me a little about your business and what you'd like help with. I read these myself and reply within two business days.</p>
+      <p><a href="tel:+18473431002">847-343-1002</a><br><a href="mailto:liz@listingsbyleslie.com">liz@listingsbyleslie.com</a></p>
+    </div>
+    <form id="contact-form" class="contact-form" name="contact" method="POST" action="/thanks.html" data-netlify="true" netlify-honeypot="company-website">
+      <input type="hidden" name="form-name" value="contact">
+      <p class="sr-only"><label for="c-hp">Leave this empty</label><input id="c-hp" name="company-website" tabindex="-1" autocomplete="off"></p>
+      <label class="field" for="c-name">Name<input id="c-name" name="name" type="text" autocomplete="name" required></label>
+      <label class="field" for="c-email">Email<input id="c-email" name="email" type="email" autocomplete="email" required></label>
+      <label class="field" for="c-phone">Phone (optional)<input id="c-phone" name="phone" type="tel" autocomplete="tel"></label>
+      <label class="field" for="c-market">Brokerage and town<input id="c-market" name="market" type="text" placeholder="Compass, Lake Forest"></label>
+      <label class="field full" for="c-topic">What would you like help with?
+        <select id="c-topic" name="topic">
+          <option>Booking a session</option>
+          <option>Getting more reviews</option>
+          <option>Growing referrals</option>
+          <option>Showing up in AI search</option>
+          <option>A session for my team</option>
+          <option>Something else</option>
+        </select>
+      </label>
+      <label class="field full" for="c-msg">Message<textarea id="c-msg" name="message" rows="5" placeholder="If you're requesting a time, list a few days and times that work."></textarea></label>
+      <div class="full"><button class="btn" type="submit">Send <span aria-hidden="true">→</span></button></div>
+    </form>
+    <p id="contact-status" class="success" role="status" hidden></p>
+  </div>
+</section>
+</main>
+
+<footer class="site-footer">
+  <div class="wrap">
+    <span>Liz Turnbaugh Federman, Broker · The Leslie McDonnell Team · RE/MAX Suburban · Libertyville, IL · <a href="tel:+18473431002">847-343-1002</a> · <a href="mailto:liz@listingsbyleslie.com">liz@listingsbyleslie.com</a></span>
+    <span class="fine">Each RE/MAX office is independently owned and operated. Coaching is educational, not brokerage services.</span>
+  </div>
+</footer>
+<script src="assets/site.js" defer></script>
+</body>
+</html>
