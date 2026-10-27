@@ -23,8 +23,30 @@
     X-Content-Type-Options = "nosniff"
     Referrer-Policy = "strict-origin-when-cross-origin"
     X-Frame-Options = "SAMEORIGIN"
+    Permissions-Policy = "camera=(), microphone=(), geolocation=()"
 
+# Scripts and styles have no version in their names, so browsers must check for a new copy
+# on every visit; otherwise a fix can take a week to reach returning visitors.
 [[headers]]
   for = "/assets/*"
   [headers.values]
+    Cache-Control = "public, max-age=0, must-revalidate"
+
+[[headers]]
+  for = "/assets/img/*"
+  [headers.values]
     Cache-Control = "public, max-age=604800"
+
+# The toolkit is locked by netlify/edge-functions/toolkit-gate.ts. Never cache either version
+# of /toolkit/ (locked or unlocked) in a shared cache, and keep both out of search results.
+[[headers]]
+  for = "/toolkit/*"
+  [headers.values]
+    Cache-Control = "private, no-store"
+    X-Robots-Tag = "noindex"
+
+[[headers]]
+  for = "/attendee/*"
+  [headers.values]
+    Cache-Control = "private, no-store"
+    X-Robots-Tag = "noindex"

@@ -1,27 +1,48 @@
 import type { Config } from "@netlify/functions";
-import { and, gte, lte, ne } from "drizzle-orm";
+import { and, gte, lte, ne, sql } from "drizzle-orm";
 import { db } from "../../db/index.js";
 import { bookings } from "../../db/schema.js";
+import { BOOKING_RULES, bookableRange, slotError, todayIn } from "../lib/booking-rules.js";
 
-const DATE = /^\d{4}-\d{2}-\d{2}$/;
-const TIME = /^(1[0-2]|[1-9]):[0-5]\d (AM|PM)$/;
 const EMAIL = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
 const json = (body: unknown, status = 200) =>
   Response.json(body, { status, headers: { "Cache-Control": "no-store" } });
 
+function longDate(iso: string): string {
+  return new Intl.DateTimeFormat("en-US", { weekday: "long", month: "long", day: "numeric", year: "numeric", timeZone: "UTC" }).format(
+    new Date(`${iso}T12:00:00Z`),
+  );
+}
+
+// Sends the request to the "booking" Netlify form so Liz gets the email notification.
+// Done here, after the slot is saved, so a held time always produces an email.
+async function notify(origin: string, fields: Record<string, string>): Promise<boolean> {
+  try {
+    const r = await fetch(new URL("/", origin), {
+      method: "POST",
+      headers: { "Content-Type": "application/x-www-form-urlencoded" },
+      body: new URLSearchParams({ "form-name": "booking", ...fields }).toString(),
+    });
+    if (!r.ok) console.error("booking notification failed", r.status);
+    return r.ok;
+  } catch (err) {
+    console.error("booking notification failed", err);
+    return false;
+  }
+}
+
 export default async (req: Request) => {
-  // GET /api/bookings?from=YYYY-MM-DD&to=YYYY-MM-DD → taken slots only, never names or emails
+  const rules = BOOKING_RULES;
+
+  // GET /api/bookings → the calendar rules and the taken slots in range. Never names or emails.
   if (req.method === "GET") {
-    const url = new URL(req.url);
-    const from = url.searchParams.get("from") ?? "";
-    const to = url.searchParams.get("to") ?? "";
-    if (!DATE.test(from) || !DATE.test(to)) return json({ error: "from and to are required" }, 400);
+    const { first, last } = bookableRange(rules);
     const rows = await db
       .select({ date: bookings.sessionDate, time: bookings.sessionTime })
       .from(bookings)
-      .where(and(gte(bookings.sessionDate, from), lte(bookings.sessionDate, to), ne(bookings.status, "cancelled")));
-    return json({ taken: rows });
+      .where(and(gte(bookings.sessionDate, first), lte(bookings.sessionDate, last), ne(bookings.status, "cancelled")));
+    return json({ rules: { ...rules, first, last }, taken: rows });
   }
 
   if (req.method === "POST") {
@@ -33,25 +54,38 @@ export default async (req: Request) => {
     }
     const s = (k: string) => (typeof body[k] === "string" ? (body[k] as string).trim() : "");
     // Honeypot: bots fill every field. Pretend it worked.
-    if (s("company-website")) return json({ ok: true }, 201);
+    if (s("company-website")) return json({ ok: true, notified: true }, 201);
 
     const date = s("date");
     const time = s("time");
     const name = s("name").slice(0, 120);
-    const email = s("email").slice(0, 200);
+    const email = s("email").slice(0, 200).toLowerCase();
     const market = s("market").slice(0, 200);
-    if (!DATE.test(date) || !TIME.test(time) || !name || !EMAIL.test(email)) {
-      return json({ error: "Please fill in your name, a valid email, a day and a time." }, 400);
+    if (!name || !EMAIL.test(email)) return json({ error: "Please fill in your name and a valid email." }, 400);
+    const ruleError = slotError(rules, date, time);
+    if (ruleError) return json({ error: ruleError }, 400);
+
+    const [{ active }] = await db
+      .select({ active: sql<number>`count(*)::int` })
+      .from(bookings)
+      .where(and(sql`lower(${bookings.email}) = ${email}`, gte(bookings.sessionDate, todayIn(rules.timezone)), ne(bookings.status, "cancelled")));
+    if (active >= rules.maxActivePerEmail) {
+      return json({ error: "You already have sessions requested. Liz will be in touch, or send a note below to change them." }, 429);
     }
-    const today = new Date().toISOString().slice(0, 10);
-    if (date <= today) return json({ error: "That day has passed. Please pick another." }, 400);
 
     try {
       const [row] = await db
         .insert(bookings)
         .values({ sessionDate: date, sessionTime: time, name, email, market })
         .returning({ id: bookings.id });
-      return json({ ok: true, id: row.id }, 201);
+      const notified = await notify(new URL(req.url).origin, {
+        "session-date": longDate(date),
+        "session-time": `${time} ${rules.timezoneLabel}`,
+        name,
+        email,
+        market,
+      });
+      return json({ ok: true, id: row.id, notified }, 201);
     } catch (err) {
       const code = (err as { code?: string; cause?: { code?: string } }).code ?? (err as { cause?: { code?: string } }).cause?.code;
       if (code === "23505") return json({ error: "Someone just took that time. Please pick another." }, 409);
@@ -64,4 +98,6 @@ export default async (req: Request) => {
 
 export const config: Config = {
   path: "/api/bookings",
+  // Stops a script from filling the calendar: 20 requests a minute per visitor.
+  rateLimit: { windowLimit: 20, windowSize: 60, aggregateBy: ["ip", "domain"] },
 };

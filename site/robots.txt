@@ -1,0 +1,6 @@
+User-agent: *
+Disallow: /toolkit/
+Disallow: /attendee/
+Disallow: /thanks
+
+Sitemap: https://zerocostvisibility.com/sitemap.xml

@@ -1,32 +1,74 @@
-# zerocostvisibility.com: launch checklist
+# zerocostvisibility.com: setup and launch checklist
 
-The site lives in `site/`. There is no build step for the pages. The booking calendar's backend is a Netlify Function (`netlify/functions/bookings.ts`) backed by Netlify Database; its table is created automatically on deploy. The `netlify.toml` at the repo root tells Netlify to publish `site/`, so every push to `main` deploys automatically.
+The pages live in `site/` (plain HTML, no build step). Server code lives in `netlify/`:
+- `functions/bookings.ts`: the built-in booking calendar.
+- `functions/toolkit-access.ts`: checks the attendee code.
+- `edge-functions/toolkit-gate.ts`: keeps `/toolkit/` locked.
+
+Data lives in Netlify Database. Its tables are created and updated automatically on deploy from `netlify/database/migrations/`.
+
+**Deploys come from GitHub.** Every push to `main` deploys automatically. Don't drag a folder into Netlify: a manual upload doesn't include the server code or run the database migrations.
 
 ## Pages
-- `/` Home
-- `/book` Book a session (calendar) + contact form
-- `/toolkit/` Starpower attendee toolkit (attendee code + email, then every template with copy buttons)
-- `/thanks.html` Fallback thank-you page for the contact form
-- Short links for the deck QR codes: `/starpower` (closing slide) and `/reviews` (slide 14)
+| URL | What it is |
+|---|---|
+| `/` | Home |
+| `/book` | Book a session (calendar) and contact form |
+| `/toolkit/` | Starpower attendee toolkit. Locked; visitors without access see the code page at the same address |
+| `/attendee/` | The code page itself |
+| `/thanks.html` | Fallback thank-you page for the contact form |
+| `/starpower` | Short link for the QR code on the closing slide |
+| `/reviews` | Short link for the QR code on slide 14 (opens the review request) |
 
-## Go live (about 30 minutes)
-1. **Buy the domain** zerocostvisibility.com (about $11/yr), or add it in Netlify > Domain management > Buy a domain.
-2. **Netlify:** app.netlify.com > Add new project > Deploy manually > drag this folder in. You get a preview URL ending in netlify.app; test there first.
-3. **Domain:** in Netlify, Domain management > Add a domain > zerocostvisibility.com, then follow the DNS steps. HTTPS turns on automatically.
-4. **Form emails:** Netlify > Forms > Form notifications > Email notification for `booking`, `contact` and `toolkit-access` to the address that should receive them. `booking` holds the day and time someone picked on the Book page calendar.
-5. **Booking calendar:** the Book page has a built-in calendar. Visitors pick an open day and time, and that time is saved in the site's database so nobody else can take it (taken times show as crossed out). Liz gets each request by email through the `booking` form and confirms with the Zoom link and payment. Open days, times, notice and days off are in the `BOOKING` settings near the top of `site/assets/site.js` (Tue/Wed/Thu at 9:00, 11:00, 1:30 and 4:00 Central to start). To free up a time after a cancellation, set that booking's status to `cancelled` in the database (Netlify > Database).
-   **Later, for instant booking and payment (optional):** create the "1:1 Visibility Session" event in Cal.com (60 min, Zoom, price), connect Stripe in the Cal.com app store, then set `var CAL_LINK = '';` in the same file to your Cal.com link (for example `'liz-federman/visibility-session'`). Cal.com then replaces the built-in calendar.
-6. **Attendee code:** it's `STARPOWER` (not case sensitive). To change it, find `var ACCESS_CODE = 'STARPOWER';` in the same file.
+## One-time setup in Netlify (about 20 minutes)
+1. **Connect the repo.** Project configuration > Build & deploy > Link repository > GitHub > `zerocostvisibility`. Set branch `main`, leave the build command empty, publish directory `site`.
+2. **Attendee code.** Project configuration > Environment variables > Add:
+   - `TOOLKIT_CODE` = `STARPOWER` (or whatever is on the closing slide; not case sensitive)
+   - `TOOLKIT_SECRET` = any long random text, 32+ characters. A password manager's generator works. This signs the "already entered the code" cookie.
+
+   Changing either value signs everyone out, so they'd need the code again.
+3. **Form emails.** Forms > Form notifications > Email notification for `booking`, `contact` and `toolkit-access`, sent to the address that should receive them.
+4. **Domain.** Domain management > Add a domain > zerocostvisibility.com, then make it the primary domain so the netlify.app address redirects to it.
+
+## Booking: built-in calendar, Calendly or Cal.com
+The Book page uses the built-in calendar until a scheduler link is set in `site/assets/config.js`.
+- **Built-in (default):** visitors pick an open time and it's held so nobody else can take it. Liz gets an email (the `booking` form) and confirms by hand with the Zoom link and payment. Open days, times, notice period and days off are set in `netlify/lib/booking-rules.ts`. To free a time after a cancellation, set that booking's `status` to `cancelled` in Netlify > Database.
+- **Calendly:** set `bookingProvider: 'calendly'` and `bookingUrl: 'https://calendly.com/…/visibility-session'`. Calendly sends the invite and notifications itself. Taking payment at booking needs Calendly Standard ($10/mo) with Stripe connected.
+- **Cal.com:** set `bookingProvider: 'cal'` and `bookingUrl: 'liz-federman/visibility-session'`. The free plan takes Stripe payments.
+
+## Google Analytics 4 and Search Console
+1. **GA4:** analytics.google.com > Admin > Create property > Web data stream for zerocostvisibility.com. Copy the measurement ID (`G-…`) into `ga4Id` in `site/assets/config.js`. Tracking only runs on the live site.
+2. **Key events:** in GA4 > Admin > Events, mark `generate_lead` (booking or contact form sent) and `toolkit_unlock` as key events.
+3. **Events the site sends:**
+
+   | Event | When | Details |
+   |---|---|---|
+   | `toolkit_unlock` | Attendee entered the right code | `source` = which QR code |
+   | `toolkit_code_fail` | Wrong code entered | |
+   | `copy_template` | A template was copied | `template_name`, `section` |
+   | `print_toolkit` | Print or save PDF | |
+   | `book_cta`, `toolkit_cta`, `contact_cta` | Button clicked | `location` = which button |
+   | `booking_time_selected` | A time was picked | `method` |
+   | `generate_lead` | Booking or contact form sent | `form`, `method` |
+   | `contact_click` | Phone or email link tapped | `method` |
+
+   Scans from each QR code show up in Acquisition > Traffic acquisition under campaign `starpower2026`. The content dimension is `closing-slide` or `slide14`.
+4. **Search Console:** search.google.com/search-console > Add property > Domain > zerocostvisibility.com, then add the TXT record it gives you at your domain registrar. Then go to Sitemaps and submit `sitemap.xml`. (The other option, a verification `<meta>` tag, has a marked spot in `site/index.html`.)
+
+## Who opened the toolkit
+Netlify > Database > `toolkit_access` lists every email that entered the right code, with the QR code it came from. The same people also appear under Forms > `toolkit-access`.
 
 ## Test before Nov 7
-- Scan both QR codes from a printed slide, on cellular, not Wi-Fi.
+- Scan both QR codes from a printed slide, on cellular, not Wi-Fi. Slide 14 should land on the review request after the code.
 - Enter a wrong code, then the right one. Copy a template and paste it into a text.
-- Scan the slide 14 QR code on a fresh phone: after the code it should land on the review request.
-- Request a time on the Book page calendar and confirm the email arrives.
+- Request a time on the Book page and confirm the email arrives. Then set that booking to `cancelled` and check the time opens up again.
 - Submit the contact form and confirm the email arrives.
-- Book and pay a $1 test session, then refund it in Stripe.
+- If using Calendly or Cal.com: book and pay a $1 test session, then refund it.
+- In GA4 > Reports > Realtime, check that your own visit and events show up.
+
+## Automated checks
+`npm test` runs the unit tests. `npm run test:e2e` starts a local stand-in for Netlify and clicks every link, tab, copy button and form in Chromium. It also checks phone layout and accessibility. Playwright must be installed (`npm i -D playwright`, or a global install with `NODE_PATH=$(npm root -g)`).
 
 ## Notes
-- The attendee code is a speed bump, not a real lock. For a true password, move `/toolkit/` to its own Netlify project on Netlify Pro and turn on Password visibility.
 - Founding price on the Book page says $297 for the first 10 sessions, then $397. Edit `site/book.html` if that changes.
 - Client photos (both closing selfies) need each client's OK before launch.
