@@ -8,23 +8,31 @@
 
 <meta property="og:title" content="Book a Session | Liz Turnbaugh Federman">
 <meta property="og:description" content="Book a 60-minute 1:1 session with Liz Turnbaugh Federman: a close look at your business and a 90-day plan for your market.">
-<meta property="og:image" content="https://zerocostvisibility.com/assets/img/hero-liz.jpg">
+<meta property="og:image" content="https://zerocostvisibility.netlify.app/assets/img/hero-liz.jpg">
 <link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,500;0,600;1,500&family=Libre+Franklin:wght@400;500;600&display=swap">
-<link rel="stylesheet" href="assets/site.css">
+<link rel="canonical" href="https://zerocostvisibility.netlify.app/book">
+<meta property="og:url" content="https://zerocostvisibility.netlify.app/book">
+<meta property="og:type" content="website">
+<meta name="twitter:card" content="summary_large_image">
+<link rel="icon" href="/favicon.svg" type="image/svg+xml">
+<link rel="icon" href="/favicon.ico" sizes="32x32">
+<link rel="apple-touch-icon" href="/apple-touch-icon.png">
+<meta name="theme-color" content="#1C2536">
+<link rel="stylesheet" href="/assets/site.css">
 </head>
 <body>
 <a class="sr-only" href="#main">Skip to content</a>
 <header class="site-header">
   <div class="wrap">
     <a class="brand" href="/" aria-label="Liz Turnbaugh Federman, home">
-      <span class="brand-name">LIZ</span><span class="brand-rule" aria-hidden="true"></span>
-      <span class="brand-tag">Coaching for agents</span>
+      <span class="brand-mark" aria-hidden="true">LTF</span>
+      <span class="brand-text"><span class="brand-name">Liz Turnbaugh Federman</span><span class="brand-tag">Coaching for agents</span></span>
     </a>
     <nav class="nav" aria-label="Main">
       <a href="/#method">How it works</a>
-      <a href="/book" aria-current="page">Coaching</a>
+      <a class="access" href="/toolkit/"><svg aria-hidden="true" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="4" y="11" width="16" height="10" rx="2"></rect><path d="M8 11V7a4 4 0 0 1 8 0v4"></path></svg> Attendee toolkit</a>
       <a href="/book#contact">Contact</a>
-      <a class="access" href="/toolkit/"><svg aria-hidden="true" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="4" y="11" width="16" height="10" rx="2"></rect><path d="M8 11V7a4 4 0 0 1 8 0v4"></path></svg> Attendee access</a>
+      <a class="nav-cta" href="/book" aria-current="page" data-track="book_cta" data-track-location="header">Book a session</a>
     </nav>
   </div>
 </header>
@@ -43,14 +51,14 @@
       </ul>
       <dl class="details" aria-label="Session details">
         <dt>Length</dt><dd>60 minutes</dd>
-        <dt>Where</dt><dd>Zoom</dd>
+        <dt>Where</dt><dd>Google Meet video call</dd>
         <dt>Price</dt><dd>$297 for the first 10 sessions, then $397</dd>
       </dl>
     </div>
 
     <div class="booking" aria-labelledby="booking-title">
       <h2 id="booking-title" style="font-size:30px">Pick a time</h2>
-      <div id="cal-inline" class="booking-embed"></div>
+      <div id="booking-embed" class="booking-embed"></div>
       <div id="booker" class="booker">
         <div class="booker-picker">
           <div class="cal-head">
@@ -58,7 +66,7 @@
             <h3 class="cal-month" aria-live="polite">&nbsp;</h3>
             <button class="cal-nav" type="button" data-cal="next" aria-label="Next month">&#8250;</button>
           </div>
-          <p class="cal-tz">60 minutes on Zoom. All times are Central Time.</p>
+          <p class="cal-tz">60 minutes on Google Meet. All times are Central Time.</p>
           <div class="cal-grid" aria-label="Available days"></div>
           <div class="slots">
             <p class="slots-day" aria-live="polite">Pick a day</p>
@@ -78,7 +86,7 @@
         </form>
         <p id="booking-status" class="success" role="status" hidden></p>
       </div>
-      <p class="form-note">Liz confirms every request by email with your Zoom link and payment details. None of these times work? <a href="#contact">Send a note</a> with a few that do.</p>
+      <p class="form-note" id="booking-note">Liz confirms every request by email with your Google Meet link and payment details. None of these times work? <a href="#contact">Send a note</a> with a few that do.</p>
     </div>
   </div>
 </section>
@@ -121,6 +129,7 @@
     <span class="fine">Each RE/MAX office is independently owned and operated. Coaching is educational, not brokerage services.</span>
   </div>
 </footer>
-<script src="assets/site.js" defer></script>
+<script src="/assets/config.js" defer></script>
+<script src="/assets/site.js" defer></script>
 </body>
 </html>

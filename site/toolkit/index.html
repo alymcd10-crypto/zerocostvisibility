@@ -8,189 +8,152 @@
 <meta name="robots" content="noindex">
 <meta property="og:title" content="Starpower Toolkit | Liz Turnbaugh Federman">
 <meta property="og:description" content="The Starpower attendee toolkit, for people who heard Liz speak. You'll need the code from the closing slide.">
-<meta property="og:image" content="https://zerocostvisibility.com/assets/img/hero-liz.jpg">
+<meta property="og:image" content="https://zerocostvisibility.netlify.app/assets/img/hero-liz.jpg">
 <link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,500;0,600;1,500&family=Libre+Franklin:wght@400;500;600&display=swap">
-<link rel="stylesheet" href="../assets/site.css">
+<link rel="canonical" href="https://zerocostvisibility.netlify.app/toolkit/">
+<meta property="og:url" content="https://zerocostvisibility.netlify.app/toolkit/">
+<meta property="og:type" content="website">
+<meta name="twitter:card" content="summary_large_image">
+<link rel="icon" href="/favicon.svg" type="image/svg+xml">
+<link rel="icon" href="/favicon.ico" sizes="32x32">
+<link rel="apple-touch-icon" href="/apple-touch-icon.png">
+<meta name="theme-color" content="#1C2536">
+<link rel="stylesheet" href="/assets/site.css">
 </head>
 <body>
 <a class="sr-only" href="#main">Skip to content</a>
 <header class="site-header">
   <div class="wrap">
     <a class="brand" href="/" aria-label="Liz Turnbaugh Federman, home">
-      <span class="brand-name">LIZ</span><span class="brand-rule" aria-hidden="true"></span>
-      <span class="brand-tag">Coaching for agents</span>
+      <span class="brand-mark" aria-hidden="true">LTF</span>
+      <span class="brand-text"><span class="brand-name">Liz Turnbaugh Federman</span><span class="brand-tag">Coaching for agents</span></span>
     </a>
     <nav class="nav" aria-label="Main">
       <a href="/#method">How it works</a>
-      <a href="/book">Coaching</a>
+      <a class="access" href="/toolkit/" aria-current="page"><svg aria-hidden="true" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="4" y="11" width="16" height="10" rx="2"></rect><path d="M8 11V7a4 4 0 0 1 8 0v4"></path></svg> Attendee toolkit</a>
       <a href="/book#contact">Contact</a>
-      <a class="access" href="/toolkit/" aria-current="page"><svg aria-hidden="true" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="4" y="11" width="16" height="10" rx="2"></rect><path d="M8 11V7a4 4 0 0 1 8 0v4"></path></svg> Attendee access</a>
+      <a class="nav-cta" href="/book" data-track="book_cta" data-track-location="header">Book a session</a>
     </nav>
   </div>
 </header>
 <main id="main">
-<section class="tk-hero wrap narrow" aria-labelledby="tk-title">
-  <div class="tk-hero-copy">
-    <p class="eyebrow">The Starpower toolkit</p>
-    <h1 id="tk-title">Your next chapter <em>starts here.</em></h1>
-    <p class="lede">Everything from the talk, written out so you can use it this week.</p>
-  </div>
-  <div class="tk-hero-photo">
-    <img src="../assets/img/envelopes.jpg" alt="Cream envelopes sealed with gold wax" width="1000" height="1250" fetchpriority="high">
-  </div>
+<section class="tk-intro wrap" aria-labelledby="tk-title">
+  <p class="eyebrow">Starpower 2026 · Attendee toolkit</p>
+  <h1 id="tk-title">Everything I use. <em>Ready to copy.</em></h1>
+  <p class="lede">Every message and checklist from the talk, written out so you can use it this week. Tap copy, paste it into a text, and swap in your name, number and links.</p>
 </section>
 
-<section class="gate" id="gate" aria-labelledby="gate-title">
-  <div class="wrap narrow">
-    <form id="gate-form" class="gate-card" name="toolkit-access" method="POST" data-netlify="true" netlify-honeypot="company-website">
-      <input type="hidden" name="form-name" value="toolkit-access">
-      <p class="sr-only"><label for="g-hp">Leave this empty</label><input id="g-hp" name="company-website" tabindex="-1" autocomplete="off"></p>
-      <h2 id="gate-title" style="font-size:32px">Enter your attendee code</h2>
-      <p id="gate-hint" class="success" hidden>Enter the code once and you'll go straight to the section you were sent to.</p>
-      <p>It's on the last slide of the talk. Once you're in, use the Print button to save the whole toolkit as a PDF.</p>
-      <label class="field" for="gate-email">Email<input id="gate-email" name="email" type="email" autocomplete="email" required placeholder="you@yourbrokerage.com"></label>
-      <label class="field" for="gate-code">Attendee code<input id="gate-code" name="code" type="text" autocomplete="off" autocapitalize="characters" required placeholder="On the last slide"></label>
-      <p id="gate-error" class="form-error" role="alert" hidden></p>
-      <div><button class="btn" type="submit">Open my toolkit <span aria-hidden="true">→</span></button></div>
-      <p class="form-note">Liz may send the occasional note. Reply and ask her to stop at any time.</p>
-    </form>
-  </div>
-</section>
-
-<div id="toolkit-content" hidden>
-<nav class="tk-nav" aria-label="Toolkit sections">
-  <div class="wrap narrow">
-    <a href="#step1">1 · Give clients the post</a>
-    <a href="#step2">2 · The 90-second ask</a>
-    <a href="#step3">3 · The review request</a>
-    <a href="#ai">AI search</a>
-    <a href="#calendar">Past-client calendar</a>
-    <button class="copy-btn tk-print" type="button" data-print>Print</button>
+<nav class="tk-tabs" aria-label="Toolkit sections">
+  <div class="wrap">
+    <a href="#step1"><span>01</span> Hand them the post</a>
+    <a href="#step2"><span>02</span> The ninety-second ask</a>
+    <a href="#step3"><span>03</span> The review request</a>
+    <a href="#ai"><span>04</span> AI search</a>
+    <a href="#calendar"><span>05</span> Past-client year</a>
+    <button class="tk-print" type="button" data-print>Print or save PDF</button>
   </div>
 </nav>
-<div class="wrap narrow">
-  <div class="options tk-options">
-    <div class="row">
-      <div class="row-media"><div class="cover navy"><span>The Three-Step Playbook</span></div></div>
-      <div class="row-copy"><h2>The three-step playbook</h2><p>Client posts, community asks, and reviews, in the order Liz runs them, with the words for each.</p></div>
-      <a class="btn" href="#step1">Read the guide <span aria-hidden="true">→</span></a>
-    </div>
-    <div class="row">
-      <div class="row-media"><div class="cover light"><span>Messages That Work</span></div></div>
-      <div class="row-copy"><h2>Messages you can make your own</h2><p>Eight seller and buyer posts, four texts for group asks, and Liz's review request.</p></div>
-      <a class="btn" href="#step3">Explore the scripts <span aria-hidden="true">→</span></a>
-    </div>
-    <div class="row">
-      <div class="row-media"><div class="cover light gold"><span>Showing Up in AI Search</span></div></div>
-      <div class="row-copy"><h2>Your AI search checklist</h2><p>Four changes that make it more likely ChatGPT names you when someone asks for an agent in your town.</p></div>
-      <a class="btn" href="#ai">See the checklist <span aria-hidden="true">→</span></a>
-    </div>
-    <div class="row">
-      <div class="row-media"><div class="cover navy"><span>The Past-Client Year</span></div></div>
-      <div class="row-copy"><h2>Your past-client calendar</h2><p>What to send at closing, at day 30, and at months 3, 6, 9 and 12.</p></div>
-      <a class="btn" href="#calendar">Get the calendar <span aria-hidden="true">→</span></a>
-    </div>
-  </div>
 
+<div class="wrap">
   <section class="tk-section" id="step1" aria-labelledby="s1-title">
     <header>
-      <p class="eyebrow">Step 1 of 3</p>
-      <h2 id="s1-title">Give clients the post</h2>
+      <p class="eyebrow">Step 01 · Client posts</p>
+      <h2 id="s1-title">Hand them <em>the post.</em></h2>
       <p>Don't ask sellers to share the listing. Give them the words. On listing day, text your seller all five options and tell them which one sounds most like them. Buyers can post three times: on keys day, once they've settled in, and after their first big project. Swap in your name and number before you send.</p>
     </header>
     <div class="tpl-grid">
-      <div class="tpl">
-        <div class="tpl-head"><h3 class="tpl-label">School and neighborhood</h3><span class="tag">Seller</span></div>
+      <article class="tpl" data-template="School and neighborhood">
+        <div class="tpl-head"><h3 class="tpl-label"><span class="tpl-num">01</span> School and neighborhood</h3><span class="tag">Seller</span></div>
         <div class="tpl-text" id="tpl-p1">Our beautiful home is on the market. [Neighborhood and school highlight, e.g. Oak Grove schools and an amazing neighborhood]. To set up a private showing, call [Your name] (our realtor) at [your phone].</div>
         <p class="tpl-best">Best for family communities and school-district markets.</p>
-        <button class="copy-btn" type="button" data-copy="tpl-p1">Copy</button>
-      </div>
-      <div class="tpl">
-        <div class="tpl-head"><h3 class="tpl-label">Top local expert</h3><span class="tag">Seller</span></div>
+        <button class="copy-btn" type="button" data-copy="tpl-p1">Copy template</button>
+      </article>
+      <article class="tpl" data-template="Top local expert">
+        <div class="tpl-head"><h3 class="tpl-label"><span class="tpl-num">02</span> Top local expert</h3><span class="tag">Seller</span></div>
         <div class="tpl-text" id="tpl-p2">Now available in the heart of [town or neighborhood]. For a private showing, contact top local expert [Your name] at [your phone].</div>
         <p class="tpl-best">Best for walkable downtowns and lifestyle listings.</p>
-        <button class="copy-btn" type="button" data-copy="tpl-p2">Copy</button>
-      </div>
-      <div class="tpl">
-        <div class="tpl-head"><h3 class="tpl-label">Shortest</h3><span class="tag">Seller</span></div>
+        <button class="copy-btn" type="button" data-copy="tpl-p2">Copy template</button>
+      </article>
+      <article class="tpl" data-template="Shortest">
+        <div class="tpl-head"><h3 class="tpl-label"><span class="tpl-num">03</span> Shortest</h3><span class="tag">Seller</span></div>
         <div class="tpl-text" id="tpl-p3">Please call my agent, [Your name], for a private showing at [your phone].</div>
         <p class="tpl-best">Best for clients who don&#x27;t want to write much.</p>
-        <button class="copy-btn" type="button" data-copy="tpl-p3">Copy</button>
-      </div>
-      <div class="tpl">
-        <div class="tpl-head"><h3 class="tpl-label">The personal story</h3><span class="tag">Seller</span></div>
+        <button class="copy-btn" type="button" data-copy="tpl-p3">Copy template</button>
+      </article>
+      <article class="tpl" data-template="The personal story">
+        <div class="tpl-head"><h3 class="tpl-label"><span class="tpl-num">04</span> The personal story</h3><span class="tag">Seller</span></div>
         <div class="tpl-text" id="tpl-p4">We bought this home seven years ago and it has been everything we hoped for. Time for the next chapter. If you or someone you love is looking in [town], message me, or call our realtor [Your name] at [your phone].</div>
         <p class="tpl-best">Best for longtime owners. Highest engagement of the five.</p>
-        <button class="copy-btn" type="button" data-copy="tpl-p4">Copy</button>
-      </div>
-      <div class="tpl">
-        <div class="tpl-head"><h3 class="tpl-label">Before it goes live</h3><span class="tag">Seller</span></div>
+        <button class="copy-btn" type="button" data-copy="tpl-p4">Copy template</button>
+      </article>
+      <article class="tpl" data-template="Before it goes live">
+        <div class="tpl-head"><h3 class="tpl-label"><span class="tpl-num">05</span> Before it goes live</h3><span class="tag">Seller</span></div>
         <div class="tpl-text" id="tpl-p5">Coming to the market in [town] next week: [X bed, Y bath, key feature]. If you know anyone looking, DM me or reach out directly to [Your name] at [your phone]. Happy to do a private walkthrough first.</div>
         <p class="tpl-best">Best for creating scarcity. Brings DMs before it hits the MLS.</p>
-        <button class="copy-btn" type="button" data-copy="tpl-p5">Copy</button>
-      </div>
-      <div class="tpl">
-        <div class="tpl-head"><h3 class="tpl-label">Keys day</h3><span class="tag">Buyer</span></div>
+        <button class="copy-btn" type="button" data-copy="tpl-p5">Copy template</button>
+      </article>
+      <article class="tpl" data-template="Keys day">
+        <div class="tpl-head"><h3 class="tpl-label"><span class="tpl-num">06</span> Keys day</h3><span class="tag">Buyer</span></div>
         <div class="tpl-text" id="tpl-p6">We did it. After [length of search] we finally found our home in [town]. So grateful to [Your name] with [your team and brokerage] for finding it and getting our offer accepted in a multiple-offer situation. If you&#x27;re looking in the area, [Your name] is the one to call: [your phone].</div>
         <p class="tpl-best">Best for buyers who beat out multiple offers.</p>
-        <button class="copy-btn" type="button" data-copy="tpl-p6">Copy</button>
-      </div>
-      <div class="tpl">
-        <div class="tpl-head"><h3 class="tpl-label">New to town</h3><span class="tag">Buyer</span></div>
+        <button class="copy-btn" type="button" data-copy="tpl-p6">Copy template</button>
+      </article>
+      <article class="tpl" data-template="New to town">
+        <div class="tpl-head"><h3 class="tpl-label"><span class="tpl-num">07</span> New to town</h3><span class="tag">Buyer</span></div>
         <div class="tpl-text" id="tpl-p7">Officially residents of [town]. We&#x27;re so excited to be here. Huge thank-you to our realtor [Your name] for making the move feel manageable from across the country. If anyone has restaurant, preschool or contractor recommendations, send them our way. And if you&#x27;re house-hunting here, our realtor is the one: [your phone].</div>
         <p class="tpl-best">Best for relocation buyers. Doubles as a we-belong-here post.</p>
-        <button class="copy-btn" type="button" data-copy="tpl-p7">Copy</button>
-      </div>
-      <div class="tpl">
-        <div class="tpl-head"><h3 class="tpl-label">The renovation reveal</h3><span class="tag">Buyer</span></div>
+        <button class="copy-btn" type="button" data-copy="tpl-p7">Copy template</button>
+      </article>
+      <article class="tpl" data-template="The renovation reveal">
+        <div class="tpl-head"><h3 class="tpl-label"><span class="tpl-num">08</span> The renovation reveal</h3><span class="tag">Buyer</span></div>
         <div class="tpl-text" id="tpl-p8">Six months in our [town] home and the [kitchen / yard / basement] is finally done. Sharing because so many of you helped, including [Your name], who connected us with [contractor] the week we moved in. Still recommending [Your name] to anyone who&#x27;ll listen: [your phone].</div>
         <p class="tpl-best">Best 6 to 12 months after closing. A second wave from the same client.</p>
-        <button class="copy-btn" type="button" data-copy="tpl-p8">Copy</button>
-      </div></div>
+        <button class="copy-btn" type="button" data-copy="tpl-p8">Copy template</button>
+      </article>
+    </div>
   </section>
 
   <section class="tk-section" id="step2" aria-labelledby="s2-title">
     <header>
-      <p class="eyebrow">Step 2 of 3</p>
-      <h2 id="s2-title">The 90-second ask</h2>
+      <p class="eyebrow">Step 02 · Community groups</p>
+      <h2 id="s2-title">The ninety-second <em>ask.</em></h2>
       <p>When someone posts "anyone know a realtor?" in a local Facebook group, text three to five past clients who live there. Turn on post alerts for 8 to 10 community groups and keep your past clients sorted by neighborhood, so you can send the ask within 90 seconds.</p>
     </header>
     <div class="tpl-grid four">
-      <div class="tpl">
-        <div class="tpl-head"><h3 class="tpl-label">Your closest clients</h3><span class="tag">Text</span></div>
+      <article class="tpl" data-template="Your closest clients">
+        <div class="tpl-head"><h3 class="tpl-label"><span class="tpl-num">01</span> Your closest clients</h3><span class="tag">Text</span></div>
         <div class="tpl-text" id="tpl-a1">(Send a screenshot of the post)
 Please chime in if you can.</div>
         <p class="tpl-best">For your top 10 to 15 raving fans. They don&#x27;t need context.</p>
-        <button class="copy-btn" type="button" data-copy="tpl-a1">Copy</button>
-      </div>
-      <div class="tpl">
-        <div class="tpl-head"><h3 class="tpl-label">Recent clients</h3><span class="tag">Text</span></div>
+        <button class="copy-btn" type="button" data-copy="tpl-a1">Copy template</button>
+      </article>
+      <article class="tpl" data-template="Recent clients">
+        <div class="tpl-head"><h3 class="tpl-label"><span class="tpl-num">02</span> Recent clients</h3><span class="tag">Text</span></div>
         <div class="tpl-text" id="tpl-a2">(Send a screenshot of the post)
 Would you mind chiming in on this group if you can?</div>
         <p class="tpl-best">For clients you closed with in the last 12 months.</p>
-        <button class="copy-btn" type="button" data-copy="tpl-a2">Copy</button>
-      </div>
-      <div class="tpl">
-        <div class="tpl-head"><h3 class="tpl-label">Long-ago clients</h3><span class="tag">Text</span></div>
+        <button class="copy-btn" type="button" data-copy="tpl-a2">Copy template</button>
+      </article>
+      <article class="tpl" data-template="Long-ago clients">
+        <div class="tpl-head"><h3 class="tpl-label"><span class="tpl-num">03</span> Long-ago clients</h3><span class="tag">Text</span></div>
         <div class="tpl-text" id="tpl-a3">Hi [name], saw this post in [group] and thought of you. Would you mind dropping a quick comment if you&#x27;re up for it? Totally no pressure either way.</div>
         <p class="tpl-best">For clients from 2+ years ago. Warmth plus a reminder of who you are.</p>
-        <button class="copy-btn" type="button" data-copy="tpl-a3">Copy</button>
-      </div>
-      <div class="tpl">
-        <div class="tpl-head"><h3 class="tpl-label">When they ask how to help</h3><span class="tag">In person</span></div>
+        <button class="copy-btn" type="button" data-copy="tpl-a3">Copy template</button>
+      </article>
+      <article class="tpl" data-template="When they ask how to help">
+        <div class="tpl-head"><h3 class="tpl-label"><span class="tpl-num">04</span> When they ask how to help</h3><span class="tag">In person</span></div>
         <div class="tpl-text" id="tpl-a4">Honestly? The most valuable thing you could do is post about our experience on your Facebook page. Tag me if you&#x27;re comfortable, or just mention me by name. Those community posts are how people find me.</div>
         <p class="tpl-best">For when the client offers first. Always say: make the post.</p>
-        <button class="copy-btn" type="button" data-copy="tpl-a4">Copy</button>
-      </div></div>
+        <button class="copy-btn" type="button" data-copy="tpl-a4">Copy template</button>
+      </article>
+    </div>
   </section>
 
   <section class="tk-section" id="step3" aria-labelledby="s3-title">
-    <header>
-      <p class="eyebrow">Step 3 of 3</p>
-      <h2 id="s3-title">Ask for the review, then reuse it</h2>
-    </header>
     <div class="review">
       <div class="review-aside">
+        <p class="eyebrow">Step 03 · The review request</p>
+        <h2 id="s3-title">The message I <em>actually send.</em></h2>
         <p>Send it the week of closing, while they're still excited about the keys. If you haven't heard back, follow up on days 5, 10 and 14.</p>
         <h3>Then use every review everywhere</h3>
         <ol>
@@ -199,8 +162,8 @@ Would you mind chiming in on this group if you can?</div>
           <li>Post it on at least six channels over 30 days: Instagram, Facebook, LinkedIn, your email signature, your Google profile and your newsletter.</li>
         </ol>
       </div>
-      <div class="review-card">
-        <div class="tpl-head"><h3 class="tpl-label">Review request <span class="tag">by text or email</span></h3><button class="copy-btn" type="button" data-copy="tpl-review">Copy</button></div>
+      <article class="review-card" data-template="Review request">
+        <div class="tpl-head"><h3 class="tpl-label">Review request <span class="tag">by text or email</span></h3><button class="copy-btn solid" type="button" data-copy="tpl-review">Copy message</button></div>
         <div class="tpl-text" id="tpl-review">❤️ If you were happy with our help with your real estate experience, would you mind leaving us a review on both Google and Zillow? Reviews truly help my business and help future buyers and sellers find us!
 
 If it helps when writing your review, I’d love if you mentioned the town you bought or sold in, whether I helped you buy or sell, and anything you appreciated about the experience—such as my negotiation, pricing strategy, marketing, communication, responsiveness, local market knowledge, or help navigating the process. If phrases like “best Realtor” or “local real estate expert” genuinely describe your experience, those are wonderful to include too!
@@ -215,14 +178,14 @@ Please use your own words—personal details about your experience are always th
 
 Thank you so much for taking the time to do this. We truly appreciate your business, your trust, and your support! ❤️</div>
         <p class="tpl-best">Swap in your own Zillow and Google review links before you send.</p>
-      </div>
+      </article>
     </div>
   </section>
 
   <section class="tk-section" id="ai" aria-labelledby="ai-title">
     <header>
-      <p class="eyebrow">Bonus</p>
-      <h2 id="ai-title">Showing up in AI search</h2>
+      <p class="eyebrow">Bonus · AI search</p>
+      <h2 id="ai-title">Become the agent <em>ChatGPT names.</em></h2>
       <p>More buyers now ask ChatGPT who the best realtor in their town is. What it says depends on what it can find about you online, so make that easy to find.</p>
     </header>
     <ol class="checklist">
@@ -236,7 +199,7 @@ Thank you so much for taking the time to do this. We truly appreciate your busin
   <section class="tk-section" id="calendar" aria-labelledby="cal-title">
     <header>
       <p class="eyebrow">For every past client</p>
-      <h2 id="cal-title">The first year after closing</h2>
+      <h2 id="cal-title">The first year <em>after closing.</em></h2>
       <p>Six touches, timed from each client's closing date. None of them ask for anything.</p>
     </header>
     <ol class="timeline">
@@ -249,19 +212,18 @@ Thank you so much for taking the time to do this. We truly appreciate your busin
     </ol>
   </section>
 
-  <div style="padding-block:32px 72px">
-    <a class="cta-band" href="/book">
-      <img src="../assets/img/closing-2.jpg" alt="Liz with two clients at their new front door" width="1600" height="1200" loading="lazy">
+  <div class="tk-cta">
+    <a class="cta-band" href="/book" data-track="book_cta" data-track-location="toolkit">
+      <img src="/assets/img/closing-2.jpg" alt="Liz with two clients at their new front door" width="1000" height="750" loading="lazy">
       <span class="cta-band-copy">
         <span>
           <span class="cta-band-title">Make it yours.</span>
-          <span class="cta-band-text">Book a private session with Liz and build a plan for your own market.</span>
+          <span class="cta-band-text">Want me to look at your reviews and your plan for the next 90 days? Book a private session.</span>
         </span>
         <span class="cta-arrow" aria-hidden="true">→</span>
       </span>
     </a>
   </div>
-</div>
 </div>
 </main>
 
@@ -271,6 +233,7 @@ Thank you so much for taking the time to do this. We truly appreciate your busin
     <span class="fine">Each RE/MAX office is independently owned and operated. Coaching is educational, not brokerage services.</span>
   </div>
 </footer>
-<script src="../assets/site.js" defer></script>
+<script src="/assets/config.js" defer></script>
+<script src="/assets/site.js" defer></script>
 </body>
 </html>
