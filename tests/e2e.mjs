@@ -180,7 +180,7 @@ await step('copy rules: no em dashes, banned words or "coach" in visible text; t
       if (n > 1) problems.push(`${p}: "${once}" appears ${n} times`);
     }
     if (p !== '/toolkit/') {
-      for (const secret of ['I ask for it', 'Hand them the post', 'ninety-second ask', 'screenshot of the post']) {
+      for (const secret of ['I ask for it', 'Hand them the post', 'ninety-second ask', 'screenshot of the post', 'They post about', 'They recommend', 'They review', 'Facebook group', 'client post']) {
         if (text.includes(secret)) problems.push(`${p}: gated text "${secret}" on a public page`);
       }
     }
