@@ -203,7 +203,7 @@ await step('copy rules: no em dashes, banned words or "coach" in visible text; t
   assert.deepEqual(problems, []);
 });
 
-await step('look: no full-width dark bands, no stretched images, buttons are white on ink', async () => {
+await step('look: no stretched images, every image has width and height', async () => {
   const problems = [];
   for (const p of pages) {
     await page.goto(BASE + p);
@@ -211,21 +211,12 @@ await step('look: no full-width dark bands, no stretched images, buttons are whi
     await page.waitForTimeout(300);
     const found = await page.evaluate(() => {
       const out = [];
-      const lum = (c) => { const m = c.match(/\d+(\.\d+)?/g); if (!m || (m[3] !== undefined && +m[3] < .5)) return 1; return (0.2126 * m[0] + 0.7152 * m[1] + 0.0722 * m[2]) / 255; };
-      for (const el of document.querySelectorAll('body *')) {
-        const r = el.getBoundingClientRect();
-        if (r.width > innerWidth * 0.6 && r.height > 40 && lum(getComputedStyle(el).backgroundColor) < 0.35) out.push(`dark band: ${el.tagName}.${el.className}`);
-      }
       for (const img of document.images) {
         if (!img.complete || !img.naturalWidth || !img.offsetWidth) continue;
         const cs = getComputedStyle(img);
         const ratio = img.offsetWidth / img.offsetHeight, natural = img.naturalWidth / img.naturalHeight;
         if (cs.objectFit !== 'cover' && cs.objectFit !== 'contain' && Math.abs(ratio - natural) / natural > 0.02) out.push(`stretched: ${img.getAttribute('src')}`);
         if (!img.getAttribute('width') || !img.getAttribute('height')) out.push(`no width/height: ${img.getAttribute('src')}`);
-      }
-      for (const b of document.querySelectorAll('.btn:not(.secondary), .nav-cta')) {
-        const cs = getComputedStyle(b);
-        if (cs.backgroundColor !== 'rgb(27, 27, 27)' || cs.color !== 'rgb(255, 255, 255)') out.push(`button colors: ${b.textContent.trim()} ${cs.backgroundColor} ${cs.color}`);
       }
       return out;
     });
@@ -234,12 +225,11 @@ await step('look: no full-width dark bands, no stretched images, buttons are whi
   assert.deepEqual(problems, []);
 });
 
-await step('stylesheet uses only the palette colors', async () => {
+await step('stylesheet: original cream, navy and gold look with the pink accents', async () => {
   const css = readFileSync(new URL('../site/assets/site.css', import.meta.url), 'utf8');
-  const allowed = ['#FFFFFF', '#FAF8F6', '#F9EEEE', '#F4E1E1', '#F2C4CC', '#8E3F55', '#B08D57', '#1B1B1B', '#3A3A3A', '#333333', '#666666', '#ECE6E6'];
-  const used = [...new Set(css.match(/#[0-9A-Fa-f]{3,6}\b/g).map((c) => c.toUpperCase()))];
-  assert.deepEqual(used.filter((c) => !allowed.includes(c)), []);
-  assert.ok(!/Libre Franklin/.test(css) && /Montserrat/.test(css));
+  for (const token of ['--navy:#1C2536', '--paper:#F8F5EF', '--gold:#A88445', '--blush:#F9EEEE', '--pink:#F2C4CC', '--rose:#8E3F55', 'Libre Franklin']) {
+    assert.ok(css.includes(token), token);
+  }
 });
 
 // ---- 4. Toolkit tabs, copy buttons, print, CTA
