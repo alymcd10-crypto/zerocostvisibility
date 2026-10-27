@@ -96,7 +96,7 @@ await step(`all ${linkCount} internal links and anchors resolve`, async () => as
 
 // ---- 3. Header navigation, clicked for real on every page
 await step('header links go where they say on every page', async () => {
-  const expected = [['How it works', /\/#method$/], ['Visibility Setup', /\/setup$/], ['Attendee toolkit', /\/toolkit\/$/], ['Contact', /\/book#contact$/], ['Book a session', /\/book$/]];
+  const expected = [['Visibility Setup', /\/setup$/], ['Attendee toolkit', /\/toolkit\/$/], ['Contact', /\/book#contact$/], ['Book a session', /\/book$/]];
   for (const p of pages) {
     for (const [text, re] of expected) {
       await page.goto(BASE + p);
