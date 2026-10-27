@@ -173,9 +173,31 @@
     }
   }
 
+  // ---- Events for sections seen on screen: <div data-track-view="event_name"> ----
+  // Fires once per page view, e.g. view_setup_pricing on /setup.
+  var viewed = document.querySelectorAll('[data-track-view]');
+  if (viewed.length && 'IntersectionObserver' in window) {
+    var seen = new IntersectionObserver(function (entries) {
+      entries.forEach(function (en) {
+        if (!en.isIntersecting) return;
+        track(en.target.getAttribute('data-track-view'));
+        seen.unobserve(en.target);
+      });
+    }, { threshold: 0.4 });
+    viewed.forEach(function (el) { seen.observe(el); });
+  }
+
   // ---- Contact form ---------------------------------------------------------
   var contact = document.getElementById('contact-form');
   if (contact) {
+    // /book?topic=setup#contact (or #contact?topic=setup) preselects the Setup topic
+    var topic = params.get('topic') || new URLSearchParams(location.hash.split('?')[1] || '').get('topic');
+    var topics = { setup: 'The Visibility Setup' };
+    if (topic && topics[topic]) contact.elements['topic'].value = topics[topic];
+    if (/^#contact\?/.test(location.hash)) {
+      var contactSection = document.getElementById('contact');
+      if (contactSection) requestAnimationFrame(function () { contactSection.scrollIntoView({ block: 'start' }); });
+    }
     contact.addEventListener('submit', function (e) {
       e.preventDefault();
       var msg = document.getElementById('contact-status');
@@ -211,7 +233,7 @@
   }
   if (embedBox && provider !== 'built-in') {
     var note = document.getElementById('booking-note');
-    if (note) note.innerHTML = 'You pay when you book and get a calendar invite with the Google Meet link right away. None of these times work? <a href="#contact">Send a note</a> with a few that do.';
+    if (note) note.innerHTML = 'You pay when you book and get a calendar invite right away. None of these times work? <a href="#contact">Send a note</a> with a few that do.';
   }
 
   // Passes the visit's UTM tags through so bookings show which slide or link they came from.
@@ -245,6 +267,19 @@
     var onBooked = function () { if (!booked) { booked = true; track('generate_lead', { form: 'booking', method: 'cal' }); } };
     window.Cal('on', { action: 'bookingSuccessfulV2', callback: onBooked });
     window.Cal('on', { action: 'bookingSuccessful', callback: onBooked });
+
+    // Never leave "Pick a time" blank: if Cal.com hasn't drawn its calendar in 8 seconds
+    // (blocked script, slow network, ad blocker), offer the calendar on its own page and a note.
+    var fallback = document.getElementById('booking-fallback');
+    var showFallback = function (reason) {
+      if (!fallback || !fallback.hidden || (reason === 'timeout' && box.querySelector('iframe'))) return;
+      var direct = document.getElementById('booking-fallback-link');
+      if (direct) direct.href = withUtm('https://cal.com/' + link);
+      fallback.hidden = false;
+      track('booking_embed_fallback', { reason: reason });
+    };
+    window.Cal('on', { action: 'linkFailed', callback: function () { showFallback('link_failed'); } });
+    setTimeout(function () { showFallback('timeout'); }, 8000);
   }
 
   function initBooker(root) {
@@ -401,7 +436,7 @@
         form.hidden = true;
         status.hidden = false;
         status.textContent = (held ? 'Your time is held: ' : 'Request sent for ') + pick.textContent +
-          '. Liz will email you within one business day to confirm, with your Google Meet link and payment details.';
+          '. Liz will email you within one business day to confirm, with your meeting link and payment details.';
       }
       function failed() {
         btn.disabled = false;

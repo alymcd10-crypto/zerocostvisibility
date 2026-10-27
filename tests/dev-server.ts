@@ -9,7 +9,8 @@ import {
 } from "../netlify/lib/access-token.ts";
 import { BOOKING_RULES, bookableRange, slotError } from "../netlify/lib/booking-rules.ts";
 
-const ROOT = new URL("../site/", import.meta.url).pathname;
+// Serves the built site (npm run build) so {{SITE_URL}} is filled in as on Netlify.
+const ROOT = new URL("../dist/", import.meta.url).pathname;
 const PORT = Number(process.argv[2] ?? 8888);
 const SECRET = signingSecret(undefined, DEFAULT_CODE);
 const TYPES: Record<string, string> = {
