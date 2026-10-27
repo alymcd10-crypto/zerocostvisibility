@@ -90,7 +90,8 @@ p{margin:0}
 .row:nth-child(even) .cover{transform:rotate(2deg)}
 
 /* Liz's photo in the session row: keep her face in frame on wide phone crops */
-.row-media img.session-photo{object-position:50% 22%}
+.row-media img.session-photo{object-position:50% 0}
+@media (max-width:640px){.row-media:has(.session-photo){height:210px}}
 
 /* Story / prose sections */
 .section{padding-block:72px}
