@@ -89,14 +89,8 @@ p{margin:0}
 .cover.light.gold span{color:var(--gold-text)}
 .row:nth-child(even) .cover{transform:rotate(2deg)}
 
-/* Small card graphics inside option rows (Setup checklist, Audit report) */
-.plan-card{width:136px;padding:12px 12px 14px;background:#FFFDF8;border-top:3px solid var(--pink);box-shadow:4px 6px 14px rgba(28,37,54,.18);transform:rotate(-2deg);display:flex;flex-direction:column;gap:7px}
-.plan-title{font-family:var(--display);font-size:15px;font-weight:600;line-height:1.1;color:var(--ink);padding-bottom:5px;border-bottom:1px solid var(--gold)}
-.plan-line{display:flex;align-items:flex-end;gap:6px;font-size:8.5px;letter-spacing:.4px;text-transform:uppercase;color:var(--ink);white-space:nowrap}
-.plan-line b{font-weight:600}
-.plan-line i{flex:1;height:1px;background:var(--line);margin-bottom:2px}
-.report-card .plan-line i{height:4px;background:var(--blush)}
-.report-card .plan-line s{display:block;height:100%;background:var(--pink)}
+/* Liz's photo in the session row: keep her face in frame on wide phone crops */
+.row-media img.session-photo{object-position:50% 22%}
 
 /* Story / prose sections */
 .section{padding-block:72px}

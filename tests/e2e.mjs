@@ -134,7 +134,7 @@ await step('Phase 1: /setup forwards to the Book page and nothing links to it', 
   assert.equal(r.status(), 302);
   assert.equal(r.headers()['location'], '/book');
   await page.goto(BASE + '/book');
-  assert.equal(await page.locator('#c-topic').inputValue(), 'Booking a 1:1 session');
+  assert.equal(await page.locator('#c-topic').inputValue(), 'Booking a Visibility Session');
 });
 
 await step('Book page: Cal.com fallback appears after 8 seconds when the calendar never loads', async () => {
@@ -154,7 +154,7 @@ await step('built pages carry the site address, the sitemap is right, robots kee
   assert.ok(home.includes(`<link rel="canonical" href="${siteUrl}/">`));
   const ld = JSON.parse(home.match(/<script type="application\/ld\+json">([\s\S]*?)<\/script>/)[1]);
   const offers = ld['@graph'].find((n) => n['@type'] === 'ProfessionalService').makesOffer.map((o) => [o.name, o.price]);
-  assert.deepEqual(offers, [['1:1 session with Liz', '297']]);
+  assert.deepEqual(offers, [['The Zero-Cost Visibility Session', '297']]);
   const sitemap = await (await ctx.request.get(BASE + '/sitemap.xml')).text();
   assert.deepEqual([...sitemap.matchAll(/<loc>([^<]+)<\/loc>/g)].map((m) => m[1]), [`${siteUrl}/`, `${siteUrl}/book`]);
   const robots = await (await ctx.request.get(BASE + '/robots.txt')).text();
@@ -175,7 +175,7 @@ await step('copy rules: no em dashes, banned words or "coach" in visible text; t
     }
     // Say each thing once: these appear at most once per page
     const visible = await page.evaluate(() => document.body.innerText);
-    for (const once of ['$45M', '$379K', '100+', 'Google Meet', '$997', '$1,497']) {
+    for (const once of ['$45M', '$379K', '115+', 'Google Meet', '$997', '$1,497']) {
       const n = visible.split(once).length - 1;
       if (n > 1) problems.push(`${p}: "${once}" appears ${n} times`);
     }
