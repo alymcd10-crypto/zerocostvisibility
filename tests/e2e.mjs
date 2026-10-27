@@ -20,6 +20,8 @@ const state = async () => (await fetch(`http://localhost:${PORT}/__test/state`))
 const browser = await chromium.launch();
 const ctx = await browser.newContext({ viewport: { width: 1280, height: 900 } });
 await ctx.addInitScript(() => { window.__SITE_LIVE__ = true; });
+// Cal.com's real script can't load in a test; an empty stand-in lets the page queue its commands.
+await ctx.route('https://app.cal.com/**', (r) => r.fulfill({ contentType: 'text/javascript', body: '' }));
 await ctx.grantPermissions(['clipboard-read', 'clipboard-write'], { origin: BASE });
 const page = await ctx.newPage();
 const consoleErrors = [];
@@ -163,7 +165,9 @@ await step('print button and bottom CTA work', async () => {
 });
 
 // ---- 5. Booking and contact forms
+const builtInConfig = (r) => r.fulfill({ contentType: 'text/javascript', body: "window.SITE_CONFIG = { ga4Id: '', bookingProvider: 'built-in', bookingUrl: '' };" });
 await step('built-in calendar: request a time, then it shows as taken', async () => {
+  await page.route('**/assets/config.js', builtInConfig);
   await page.goto(BASE + '/book');
   await page.locator('.cal-grid button.cal-day').first().waitFor();
   const day = page.locator('.cal-grid button.cal-day[aria-pressed="true"]');
@@ -187,13 +191,22 @@ await step('built-in calendar: request a time, then it shows as taken', async ()
     const slots = await page.locator('.slot-list .slot').allInnerTexts();
     assert.ok(slots.includes(`${time} · Taken`), `slot shows taken: ${slots}`);
   } // otherwise that booking filled the day, and the day is correctly no longer offered
+  await page.unroute('**/assets/config.js', builtInConfig);
+});
+
+await step('live config: Book page loads Liz\'s Cal.com booking link', async () => {
+  const p = await ctx.newPage();
+  await p.goto(BASE + '/book');
+  assert.ok(await p.locator('#booker').isHidden(), 'built-in calendar hidden');
+  const inline = (await p.evaluate(() => (window.Cal.q || []).map((a) => Array.from(a)))).find(([c]) => c === 'inline');
+  assert.equal(inline[1].calLink, 'liz-turnbaugh-federman-realtor-n8x6v9/visibility-session');
+  await p.close();
 });
 
 await step('with a Cal.com link set, the Book page uses Cal.com instead of the built-in calendar', async () => {
   const cal = await ctx.newPage();
   await cal.route('**/assets/config.js', (r) => r.fulfill({ contentType: 'text/javascript',
     body: "window.SITE_CONFIG = { ga4Id: '', bookingProvider: 'cal', bookingUrl: 'liz-federman/visibility-session' };" }));
-  await cal.route('https://app.cal.com/**', (r) => r.abort());
   await cal.goto(BASE + '/book');
   assert.ok(await cal.locator('#booker').isHidden(), 'built-in calendar hidden');
   const queued = await cal.evaluate(() => (window.Cal && window.Cal.q || []).map((args) => Array.from(args)));

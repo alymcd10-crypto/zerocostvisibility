@@ -13,5 +13,5 @@ window.SITE_CONFIG = {
   // Recommended: Cal.com connected to Liz's Google Calendar and Google Meet, with Stripe.
   // Paste the event link (e.g. 'liz-federman/visibility-session') once it exists.
   bookingProvider: 'cal',
-  bookingUrl: ''
+  bookingUrl: 'liz-turnbaugh-federman-realtor-n8x6v9/visibility-session'
 };
