@@ -69,7 +69,7 @@ await step('closing-slide QR (/starpower) opens the toolkit directly once unlock
 });
 
 // ---- 2. Every internal link resolves, and every #anchor exists on its target page
-const pages = ['/', '/setup', '/book', '/thanks', '/attendee/', '/toolkit/'];
+const pages = ['/', '/book', '/thanks', '/attendee/', '/toolkit/'];
 const linkProblems = [];
 let linkCount = 0;
 for (const p of pages) {
@@ -96,7 +96,7 @@ await step(`all ${linkCount} internal links and anchors resolve`, async () => as
 
 // ---- 3. Header navigation, clicked for real on every page
 await step('header links go where they say on every page', async () => {
-  const expected = [['Visibility Setup', /\/setup$/], ['Attendee toolkit', /\/toolkit\/$/], ['Contact', /\/book#contact$/], ['Book a session', /\/book$/]];
+  const expected = [['Attendee toolkit', /\/toolkit\/$/], ['Contact', /\/book#contact$/], ['Book a session', /\/book$/]];
   for (const p of pages) {
     for (const [text, re] of expected) {
       await page.goto(BASE + p);
@@ -112,8 +112,8 @@ await step('header links go where they say on every page', async () => {
 });
 
 await step('home page buttons go to the right place', async () => {
-  const buttons = [['See the Visibility Setup', /\/setup$/], ['Saw me speak? Open the toolkit', /\/toolkit\/$/], ['See what\'s included', /\/setup$/],
-    ['Book an audit', /\/book$/], ['Open the toolkit', /\/toolkit\/$/], ['Send a note', /\/book#contact$/]];
+  const buttons = [['Book a 1:1 session', /\/book$/], ['Saw me speak? Open the toolkit', /\/toolkit\/$/],
+    ['Book a session', /\/book$/], ['Open the toolkit', /\/toolkit\/$/], ['Send a note', /\/book#contact$/]];
   for (const [text, re] of buttons) {
     await page.goto(BASE + '/');
     await page.getByRole('link', { name: text, exact: false }).first().click();
@@ -129,30 +129,12 @@ await step('home page buttons go to the right place', async () => {
 });
 
 // ---- 3b. The Setup page and the new offer
-await step('Setup page: buttons, topic preselect and pricing event', async () => {
-  await page.goto(BASE + '/setup');
-  assert.equal(await page.locator('h1').innerText(), 'Your system, built in two weeks.');
-  assert.equal(await page.locator('.included li').count(), 6);
-  assert.equal(await page.locator('.faq details').count(), 5);
-  assert.equal(await page.locator('.timeline li').count(), 4);
-  assert.ok(!(await events(page)).some(([n]) => n === 'view_setup_pricing'), 'pricing event waits until seen');
-  await page.locator('.price-block').scrollIntoViewIfNeeded();
-  await page.waitForTimeout(400);
-  await page.mouse.wheel(0, -400); await page.waitForTimeout(200);
-  await page.locator('.price-block').scrollIntoViewIfNeeded(); await page.waitForTimeout(400);
-  assert.equal((await events(page)).filter(([n]) => n === 'view_setup_pricing').length, 1, 'fires once');
-  await page.locator('.price-block a', { hasText: 'Start with a Visibility Audit' }).click();
-  await page.waitForLoadState('load');
-  assert.match(page.url(), /\/book$/);
-  await page.goto(BASE + '/setup');
-  await page.locator('.price-block a', { hasText: 'Ask about the Setup' }).click();
-  await page.waitForLoadState('load');
-  assert.match(page.url(), /\/book\?topic=setup#contact$/);
-  assert.equal(await page.locator('#c-topic').inputValue(), 'The Visibility Setup');
-  await page.goto(BASE + '/book#contact?topic=setup');
-  assert.equal(await page.locator('#c-topic').inputValue(), 'The Visibility Setup', 'hash form works too');
+await step('Phase 1: /setup forwards to the Book page and nothing links to it', async () => {
+  const r = await ctx.request.get(BASE + '/setup', { maxRedirects: 0 });
+  assert.equal(r.status(), 302);
+  assert.equal(r.headers()['location'], '/book');
   await page.goto(BASE + '/book');
-  assert.equal(await page.locator('#c-topic').inputValue(), 'Booking a Visibility Audit', 'default topic');
+  assert.equal(await page.locator('#c-topic').inputValue(), 'Booking a 1:1 session');
 });
 
 await step('Book page: Cal.com fallback appears after 8 seconds when the calendar never loads', async () => {
@@ -165,16 +147,16 @@ await step('Book page: Cal.com fallback appears after 8 seconds when the calenda
   await p.close();
 });
 
-await step('built pages carry the site address, sitemap lists /setup, robots keeps the gate private', async () => {
+await step('built pages carry the site address, the sitemap is right, robots keeps the gate private', async () => {
   const home = await (await ctx.request.get(BASE + '/')).text();
   assert.ok(!home.includes('{{SITE_URL}}'), 'placeholder filled');
   const { siteUrl } = JSON.parse(readFileSync(new URL('../site.config.json', import.meta.url), 'utf8'));
   assert.ok(home.includes(`<link rel="canonical" href="${siteUrl}/">`));
   const ld = JSON.parse(home.match(/<script type="application\/ld\+json">([\s\S]*?)<\/script>/)[1]);
   const offers = ld['@graph'].find((n) => n['@type'] === 'ProfessionalService').makesOffer.map((o) => [o.name, o.price]);
-  assert.deepEqual(offers, [['The Visibility Audit', '297'], ['Visibility Setup', '997']]);
+  assert.deepEqual(offers, [['1:1 session with Liz', '297']]);
   const sitemap = await (await ctx.request.get(BASE + '/sitemap.xml')).text();
-  assert.deepEqual([...sitemap.matchAll(/<loc>([^<]+)<\/loc>/g)].map((m) => m[1]), [`${siteUrl}/`, `${siteUrl}/book`, `${siteUrl}/setup`]);
+  assert.deepEqual([...sitemap.matchAll(/<loc>([^<]+)<\/loc>/g)].map((m) => m[1]), [`${siteUrl}/`, `${siteUrl}/book`]);
   const robots = await (await ctx.request.get(BASE + '/robots.txt')).text();
   for (const path of ['/toolkit/', '/attendee/', '/thanks']) assert.ok(robots.includes(`Disallow: ${path}`), path);
 });
