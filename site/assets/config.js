@@ -10,6 +10,8 @@ window.SITE_CONFIG = {
   //   'cal'       Cal.com inline scheduler; bookingUrl like 'liz-federman/visibility-session'
   // Calendly and Cal.com send the calendar invite and the email notifications themselves.
   // If bookingUrl is empty the built-in calendar is used.
-  bookingProvider: 'built-in',
+  // Recommended: Cal.com connected to Liz's Google Calendar and Google Meet, with Stripe.
+  // Paste the event link (e.g. 'liz-federman/visibility-session') once it exists.
+  bookingProvider: 'cal',
   bookingUrl: ''
 };

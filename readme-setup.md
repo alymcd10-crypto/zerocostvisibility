@@ -30,11 +30,21 @@ Data lives in Netlify Database. Its tables are created and updated automatically
 3. **Form emails.** Forms > Form notifications > Email notification for `booking`, `contact` and `toolkit-access`, sent to the address that should receive them.
 4. **Domain (later).** The site currently uses https://zerocostvisibility.netlify.app everywhere: canonical URLs, link previews, sitemap, robots.txt and the business details. Once you buy a domain, add it under Domain management and make it the primary domain. Then ask Claude to switch those addresses over, and add the new domain to the GA4 data stream and Search Console.
 
-## Booking: built-in calendar, Calendly or Cal.com
-The Book page uses the built-in calendar until a scheduler link is set in `site/assets/config.js`.
-- **Built-in (default):** visitors pick an open time and it's held so nobody else can take it. Liz gets an email (the `booking` form) and confirms by hand with the Zoom link and payment. Open days, times, notice period and days off are set in `netlify/lib/booking-rules.ts`. To free a time after a cancellation, set that booking's `status` to `cancelled` in Netlify > Database.
-- **Calendly:** set `bookingProvider: 'calendly'` and `bookingUrl: 'https://calendly.com/…/visibility-session'`. Calendly sends the invite and notifications itself. Taking payment at booking needs Calendly Standard ($10/mo) with Stripe connected.
-- **Cal.com:** set `bookingProvider: 'cal'` and `bookingUrl: 'liz-federman/visibility-session'`. The free plan takes Stripe payments.
+## Booking: Cal.com with Google Calendar and Google Meet (recommended)
+`site/assets/config.js` is already set to Cal.com. Until its link is pasted in, the Book page falls back to the built-in calendar.
+
+**Set up Cal.com (about 15 minutes, free plan):**
+1. Sign up at cal.com **with Liz's Google account** and pick a username (e.g. `liz-federman`).
+2. Apps > install **Google Calendar**, so it reads her real availability and adds each booking to her calendar. Then install **Google Meet**, so each booking gets a Meet link.
+3. Event Types > New. Name it "1:1 Visibility Session". Set the length to 60 minutes and the location to **Google Meet**, set the hours Liz wants to offer, and set Limits > minimum notice to 2 days.
+4. Apps > install **Stripe** and connect the account that should get paid. In the event's Apps tab, turn on Stripe and set the price to $297.
+5. Paste the event link into `bookingUrl` in `site/assets/config.js` (e.g. `'liz-federman/visibility-session'`), or send it to Claude.
+6. In GA4: Admin > Data streams > Website > Configure tag settings > List unwanted referrals > add `cal.com`. Then bookings credit the QR code or link the person came from, not Cal.com.
+7. Test: set the price to $1, book, check that the invite with the Meet link and Liz's email arrive, refund in Stripe, then set the price back.
+
+**Other options** in the same file:
+- **Built-in** (`bookingUrl: ''`): visitors pick an open time and it's held so nobody else can take it. Liz gets an email (the `booking` form) and confirms by hand with the Google Meet link and payment. Open days, times, notice period and days off are set in `netlify/lib/booking-rules.ts`. To free a time after a cancellation, set that booking's `status` to `cancelled` in Netlify > Database.
+- **Calendly** (`bookingProvider: 'calendly'`, `bookingUrl: 'https://calendly.com/…'`): taking payment at booking needs Calendly Standard ($10/mo).
 
 ## Google Analytics 4 and Search Console
 1. **GA4:** analytics.google.com > Admin > Create property > Web data stream for zerocostvisibility.com. Copy the measurement ID (`G-…`) into `ga4Id` in `site/assets/config.js`. Tracking only runs on the live site.

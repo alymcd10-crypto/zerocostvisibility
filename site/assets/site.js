@@ -211,7 +211,7 @@
   }
   if (embedBox && provider !== 'built-in') {
     var note = document.getElementById('booking-note');
-    if (note) note.innerHTML = 'You’ll get a calendar invite with the Zoom link right away. None of these times work? <a href="#contact">Send a note</a> with a few that do.';
+    if (note) note.innerHTML = 'You pay when you book and get a calendar invite with the Google Meet link right away. None of these times work? <a href="#contact">Send a note</a> with a few that do.';
   }
 
   // Passes the visit's UTM tags through so bookings show which slide or link they came from.
@@ -241,7 +241,10 @@
     (function (C, A, L) { var p = function (a, ar) { a.q.push(ar); }; var d = C.document; C.Cal = C.Cal || function () { var cal = C.Cal; var ar = arguments; if (!cal.loaded) { cal.ns = {}; cal.q = cal.q || []; d.head.appendChild(d.createElement('script')).src = A; cal.loaded = true; } if (ar[0] === L) { var api = function () { p(api, arguments); }; var namespace = ar[1]; api.q = api.q || []; if (typeof namespace === 'string') { cal.ns[namespace] = cal.ns[namespace] || api; p(cal.ns[namespace], ar); p(cal, ['initNamespace', namespace]); } else p(cal, ar); return; } p(cal, ar); }; })(window, 'https://app.cal.com/embed/embed.js', 'init');
     window.Cal('init', { origin: 'https://cal.com' });
     window.Cal('inline', { elementOrSelector: '#' + box.id, calLink: link, layout: 'month_view' });
-    window.Cal('on', { action: 'bookingSuccessful', callback: function () { track('generate_lead', { form: 'booking', method: 'cal' }); } });
+    var booked = false;
+    var onBooked = function () { if (!booked) { booked = true; track('generate_lead', { form: 'booking', method: 'cal' }); } };
+    window.Cal('on', { action: 'bookingSuccessfulV2', callback: onBooked });
+    window.Cal('on', { action: 'bookingSuccessful', callback: onBooked });
   }
 
   function initBooker(root) {
@@ -398,7 +401,7 @@
         form.hidden = true;
         status.hidden = false;
         status.textContent = (held ? 'Your time is held: ' : 'Request sent for ') + pick.textContent +
-          '. Liz will email you within one business day to confirm, with your Zoom link and payment details.';
+          '. Liz will email you within one business day to confirm, with your Google Meet link and payment details.';
       }
       function failed() {
         btn.disabled = false;

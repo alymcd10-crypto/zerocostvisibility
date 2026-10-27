@@ -189,6 +189,21 @@ await step('built-in calendar: request a time, then it shows as taken', async ()
   } // otherwise that booking filled the day, and the day is correctly no longer offered
 });
 
+await step('with a Cal.com link set, the Book page uses Cal.com instead of the built-in calendar', async () => {
+  const cal = await ctx.newPage();
+  await cal.route('**/assets/config.js', (r) => r.fulfill({ contentType: 'text/javascript',
+    body: "window.SITE_CONFIG = { ga4Id: '', bookingProvider: 'cal', bookingUrl: 'liz-federman/visibility-session' };" }));
+  await cal.route('https://app.cal.com/**', (r) => r.abort());
+  await cal.goto(BASE + '/book');
+  assert.ok(await cal.locator('#booker').isHidden(), 'built-in calendar hidden');
+  const queued = await cal.evaluate(() => (window.Cal && window.Cal.q || []).map((args) => Array.from(args)));
+  const inline = queued.find(([cmd]) => cmd === 'inline');
+  assert.deepEqual(inline && [inline[1].elementOrSelector, inline[1].calLink], ['#booking-embed', 'liz-federman/visibility-session']);
+  assert.ok(queued.some(([cmd, o]) => cmd === 'on' && o.action === 'bookingSuccessfulV2'), 'booking tracked');
+  assert.match(await cal.locator('#booking-note').innerText(), /Google Meet link/);
+  await cal.close();
+});
+
 await step('server rejects a Sunday and a far-future date', async () => {
   for (const date of ['2026-11-01', '2099-01-06']) {
     const r = await ctx.request.post(`${BASE}/api/bookings`, { data: { date, time: '9:00 AM', name: 'x', email: 'x@y.co' } });
