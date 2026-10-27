@@ -2,8 +2,9 @@
   "name": "zerocostvisibility",
   "version": "1.0.0",
   "scripts": {
+    "build": "node scripts/build.mjs",
     "test": "node --experimental-strip-types --no-warnings --test tests/lib.test.ts",
-    "test:e2e": "node --experimental-strip-types --no-warnings tests/dev-server.ts 8888 >/dev/null 2>&1 & SERVER=$!; sleep 1; node tests/e2e.mjs; CODE=$?; kill $SERVER; exit $CODE"
+    "test:e2e": "node scripts/build.mjs && (node --experimental-strip-types --no-warnings tests/dev-server.ts 8888 >/dev/null 2>&1 & SERVER=$!; sleep 1; node tests/e2e.mjs; CODE=$?; kill $SERVER; exit $CODE)"
   },
   "type": "module",
   "private": true,

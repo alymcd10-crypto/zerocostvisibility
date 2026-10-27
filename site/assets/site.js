@@ -173,9 +173,31 @@
     }
   }
 
+  // ---- Events for sections seen on screen: <div data-track-view="event_name"> ----
+  // Fires once per page view, e.g. view_setup_pricing on /setup.
+  var viewed = document.querySelectorAll('[data-track-view]');
+  if (viewed.length && 'IntersectionObserver' in window) {
+    var seen = new IntersectionObserver(function (entries) {
+      entries.forEach(function (en) {
+        if (!en.isIntersecting) return;
+        track(en.target.getAttribute('data-track-view'));
+        seen.unobserve(en.target);
+      });
+    }, { threshold: 0.4 });
+    viewed.forEach(function (el) { seen.observe(el); });
+  }
+
   // ---- Contact form ---------------------------------------------------------
   var contact = document.getElementById('contact-form');
   if (contact) {
+    // /book?topic=setup#contact (or #contact?topic=setup) preselects the Setup topic
+    var topic = params.get('topic') || new URLSearchParams(location.hash.split('?')[1] || '').get('topic');
+    var topics = { setup: 'The Visibility Setup' };
+    if (topic && topics[topic]) contact.elements['topic'].value = topics[topic];
+    if (/^#contact\?/.test(location.hash)) {
+      var contactSection = document.getElementById('contact');
+      if (contactSection) requestAnimationFrame(function () { contactSection.scrollIntoView({ block: 'start' }); });
+    }
     contact.addEventListener('submit', function (e) {
       e.preventDefault();
       var msg = document.getElementById('contact-status');
@@ -245,6 +267,19 @@
     var onBooked = function () { if (!booked) { booked = true; track('generate_lead', { form: 'booking', method: 'cal' }); } };
     window.Cal('on', { action: 'bookingSuccessfulV2', callback: onBooked });
     window.Cal('on', { action: 'bookingSuccessful', callback: onBooked });
+
+    // Never leave "Pick a time" blank: if Cal.com hasn't drawn its calendar in 8 seconds
+    // (blocked script, slow network, ad blocker), offer the calendar on its own page and a note.
+    var fallback = document.getElementById('booking-fallback');
+    var showFallback = function (reason) {
+      if (!fallback || !fallback.hidden || (reason === 'timeout' && box.querySelector('iframe'))) return;
+      var direct = document.getElementById('booking-fallback-link');
+      if (direct) direct.href = withUtm('https://cal.com/' + link);
+      fallback.hidden = false;
+      track('booking_embed_fallback', { reason: reason });
+    };
+    window.Cal('on', { action: 'linkFailed', callback: function () { showFallback('link_failed'); } });
+    setTimeout(function () { showFallback('timeout'); }, 8000);
   }
 
   function initBooker(root) {

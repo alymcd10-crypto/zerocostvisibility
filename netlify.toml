@@ -1,5 +1,70 @@
 [build]
-  publish = "site"
+  # Copies site/ to dist/ and fills in the site address from site.config.json
+  command = "node scripts/build.mjs"
+  publish = "dist"
+
+# Extra domains forward to the main one. These rules stay inactive until each domain is
+# added to this Netlify project as a domain alias (Domain management > Add a domain alias).
+# They must stay above every other redirect.
+[[redirects]]
+  from = "https://lizturnbaughfederman.com/*"
+  to = "https://zerocostvisibility.com/:splat"
+  status = 301
+  force = true
+
+[[redirects]]
+  from = "http://lizturnbaughfederman.com/*"
+  to = "https://zerocostvisibility.com/:splat"
+  status = 301
+  force = true
+
+[[redirects]]
+  from = "https://www.lizturnbaughfederman.com/*"
+  to = "https://zerocostvisibility.com/:splat"
+  status = 301
+  force = true
+
+[[redirects]]
+  from = "http://www.lizturnbaughfederman.com/*"
+  to = "https://zerocostvisibility.com/:splat"
+  status = 301
+  force = true
+
+[[redirects]]
+  from = "https://lizfederman.com/*"
+  to = "https://zerocostvisibility.com/:splat"
+  status = 301
+  force = true
+
+[[redirects]]
+  from = "http://lizfederman.com/*"
+  to = "https://zerocostvisibility.com/:splat"
+  status = 301
+  force = true
+
+[[redirects]]
+  from = "https://www.lizfederman.com/*"
+  to = "https://zerocostvisibility.com/:splat"
+  status = 301
+  force = true
+
+[[redirects]]
+  from = "http://www.lizfederman.com/*"
+  to = "https://zerocostvisibility.com/:splat"
+  status = 301
+  force = true
+
+[[redirects]]
+  from = "https://www.zerocostvisibility.com/*"
+  to = "https://zerocostvisibility.com/:splat"
+  status = 301
+  force = true
+
+[[redirects]]
+  from = "http://www.zerocostvisibility.com/*"
+  to = "https://zerocostvisibility.com/:splat"
+  status = 301
+  force = true
 
 [[redirects]]
   from = "/toolkit"
