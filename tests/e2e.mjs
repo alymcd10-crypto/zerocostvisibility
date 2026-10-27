@@ -22,6 +22,8 @@ const ctx = await browser.newContext({ viewport: { width: 1280, height: 900 } })
 await ctx.addInitScript(() => { window.__SITE_LIVE__ = true; });
 // Cal.com's real script can't load in a test; an empty stand-in lets the page queue its commands.
 await ctx.route('https://app.cal.com/**', (r) => r.fulfill({ contentType: 'text/javascript', body: '' }));
+const gaRequests = [];
+await ctx.route('https://www.googletagmanager.com/**', (r) => { gaRequests.push(r.request().url()); return r.fulfill({ contentType: 'text/javascript', body: '' }); });
 await ctx.grantPermissions(['clipboard-read', 'clipboard-write'], { origin: BASE });
 const page = await ctx.newPage();
 const consoleErrors = [];
@@ -260,6 +262,13 @@ if (SHOTS) {
   await page.goto(BASE + '/'); await page.screenshot({ path: `${SHOTS}/home-desktop.png` });
   await page.goto(BASE + '/book'); await page.locator('.cal-grid button').first().waitFor(); await page.screenshot({ path: `${SHOTS}/book-desktop.png`, fullPage: true });
 }
+
+await step('GA4 tag loads with the site\'s measurement ID', async () => {
+  assert.ok(gaRequests.some((u) => u.includes('gtag/js?id=G-S75HCLD4WK')), `requests: ${gaRequests.slice(0, 2)}`);
+  await page.goto(BASE + '/');
+  const config = await page.evaluate(() => (window.dataLayer || []).map((a) => Array.from(a)).find((a) => a[0] === 'config'));
+  assert.deepEqual(config, ['config', 'G-S75HCLD4WK']);
+});
 
 await step('no JavaScript errors on any page', async () => assert.deepEqual(consoleErrors, []));
 await browser.close();

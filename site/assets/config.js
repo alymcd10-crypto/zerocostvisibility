@@ -2,7 +2,7 @@
 window.SITE_CONFIG = {
   // Google Analytics 4 measurement ID, from GA4 > Admin > Data streams > Web.
   // Looks like 'G-ABC123XYZ'. Leave empty to turn tracking off.
-  ga4Id: '',
+  ga4Id: 'G-S75HCLD4WK',
 
   // How the Book page takes bookings:
   //   'built-in'  the site's own calendar (Liz gets an email per request, confirms by hand)
