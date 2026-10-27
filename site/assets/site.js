@@ -233,7 +233,7 @@
   }
   if (embedBox && provider !== 'built-in') {
     var note = document.getElementById('booking-note');
-    if (note) note.innerHTML = 'You pay when you book and get a calendar invite with the Google Meet link right away. None of these times work? <a href="#contact">Send a note</a> with a few that do.';
+    if (note) note.innerHTML = 'You pay when you book and get a calendar invite right away. None of these times work? <a href="#contact">Send a note</a> with a few that do.';
   }
 
   // Passes the visit's UTM tags through so bookings show which slide or link they came from.
@@ -436,7 +436,7 @@
         form.hidden = true;
         status.hidden = false;
         status.textContent = (held ? 'Your time is held: ' : 'Request sent for ') + pick.textContent +
-          '. Liz will email you within one business day to confirm, with your Google Meet link and payment details.';
+          '. Liz will email you within one business day to confirm, with your meeting link and payment details.';
       }
       function failed() {
         btn.disabled = false;

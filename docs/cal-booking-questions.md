@@ -13,6 +13,6 @@ Paste these into the Cal.com event (Event Types > 1:1 Visibility Session > Advan
 | 7 | About how many past clients do you have a phone number for? | Number | No |
 | 8 | Which local Facebook groups are you in? | Long text | No |
 | 9 | What's taking your time without paying off? | Long text | No |
-| 10 | If one thing changed in the next 90 days, what should it be? | Long text | Yes |
+| 10 | If one thing changed in the next few months, what should it be? | Long text | Yes |
 
-The Book page tells visitors about these questions ("When you book, you'll answer a few questions about your last year, so we start with your numbers."), so add them before the event goes live.
+The Book page tells visitors about these questions ("You answer a few questions when you book, so we start there."), so add them before the event goes live.
