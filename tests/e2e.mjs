@@ -74,11 +74,16 @@ const linkProblems = [];
 let linkCount = 0;
 for (const p of pages) {
   await page.goto(BASE + p);
-  const hrefs = await page.$$eval('a[href]', (as) => as.map((a) => a.getAttribute('href')));
-  for (const href of new Set(hrefs)) {
+  const links = await page.$$eval('a[href]', (as) => as.map((a) => [a.getAttribute('href'), a.getAttribute('rel') || '']));
+  for (const [href, rel] of new Map(links)) {
     if (/^(tel|mailto):/.test(href)) continue;
     linkCount++;
     const url = new URL(href, BASE + p);
+    // The one outside link we mean to have: the RD Training Systems partner site. It must open safely.
+    if (url.host === 'rdtrainingsystems.com') {
+      if (!/noopener/.test(rel)) linkProblems.push(`${p}: ${href} needs rel="noopener"`);
+      continue;
+    }
     if (url.host !== new URL(BASE).host) { linkProblems.push(`${p}: external link ${href}`); continue; }
     const res = await ctx.request.get(url.toString());
     if (res.status() !== 200) { linkProblems.push(`${p}: ${href} → ${res.status()}`); continue; }
@@ -112,7 +117,7 @@ await step('header links go where they say on every page', async () => {
 });
 
 await step('home page buttons go to the right place', async () => {
-  const buttons = [['Book a 1:1 session', /\/book$/], ['Saw me speak? Open the toolkit', /\/toolkit\/$/],
+  const buttons = [['Book a session', /\/book$/], ['Heard me speak? Open the toolkit', /\/toolkit\/$/],
     ['Book a session', /\/book$/], ['Open the toolkit', /\/toolkit\/$/], ['Send a note', /\/book#contact$/]];
   for (const [text, re] of buttons) {
     await page.goto(BASE + '/');

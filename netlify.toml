@@ -85,6 +85,11 @@
   status = 302
 
 [[redirects]]
+  from = "/rd"
+  to = "/toolkit/?utm_source=rd-training&utm_medium=link&utm_campaign=rd2026&utm_content=short-link"
+  status = 302
+
+[[redirects]]
   from = "/reviews"
   to = "/toolkit/?utm_source=starpower&utm_medium=qr&utm_campaign=starpower2026&utm_content=slide14#step3"
   status = 302

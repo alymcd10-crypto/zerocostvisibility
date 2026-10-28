@@ -17,10 +17,11 @@ This branch is **Phase 1**: the site offers only the 1:1 session with Liz. The V
 |---|---|
 | `/` | Home |
 | `/book` | Book the Visibility Audit (Cal.com calendar) and the contact form. `/book?topic=setup#contact` preselects the Setup in the contact form |
-| `/toolkit/` | Starpower attendee toolkit. Locked; visitors without access see the code page at the same address |
+| `/toolkit/` | Attendee toolkit for RD Training Systems sessions and other talks. Locked; visitors without access see the code page at the same address |
 | `/attendee/` | The code page itself |
 | `/thanks.html` | Fallback thank-you page for the contact form |
-| `/starpower` | Short link for the QR code on the closing slide |
+| `/starpower` | Short link for the QR code printed on the closing slide (keep: the QR is already in the deck) |
+| `/rd` | Short link to say out loud or print in RD Training Systems materials |
 | `/reviews` | Short link for the QR code on slide 14 (opens the review request) |
 
 ## One-time setup in Netlify (about 20 minutes)

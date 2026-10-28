@@ -192,7 +192,7 @@
   if (contact) {
     // /book?topic=setup#contact (or #contact?topic=setup) preselects the Setup topic
     var topic = params.get('topic') || new URLSearchParams(location.hash.split('?')[1] || '').get('topic');
-    var topics = { setup: 'The Visibility Setup' };
+    var topics = { setup: 'The Visibility Setup', speaking: 'Speaking at my event' };
     if (topic && topics[topic]) contact.elements['topic'].value = topics[topic];
     if (/^#contact\?/.test(location.hash)) {
       var contactSection = document.getElementById('contact');

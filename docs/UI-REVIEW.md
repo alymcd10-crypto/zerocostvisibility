@@ -114,3 +114,15 @@ Then:
 8. Netlify forms (settings, not code).
 
 Not recommended: adding more copy to the home page. At 282 words it's doing its job, and the Book page carries the detail.
+
+## Follow-up (same day)
+
+Done in commit "RD Training Systems partner section; audit fixes":
+- One button label everywhere: "Book a session".
+- Header tagline raised to 12px (11px on small phones).
+- Hero toolkit link is now a secondary button; inline note links have tap padding.
+- About photo swapped to the second closing photo, so Liz appears twice on the home page, not three times.
+- Toolkit tab labels shortened so all five fit; the tab row was already sticky.
+- New "Hear Liz live" section on the home page: RD Training Systems as the featured partner, an event list with one row per session, and a "Bring Liz to your event" link that preselects the contact topic.
+
+Still open: booking-card minimum height and 4-second fallback; centring the fit/proof sections on desktop; Netlify form detection (settings).
