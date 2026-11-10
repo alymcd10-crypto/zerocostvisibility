@@ -90,8 +90,18 @@
   status = 302
 
 [[redirects]]
+  from = "/rd-binder"
+  to = "/toolkit/?utm_source=rd-training&utm_medium=print&utm_campaign=reset-dec-2026&utm_content=binder"
+  status = 302
+
+[[redirects]]
   from = "/reviews"
   to = "/toolkit/?utm_source=rd-training&utm_medium=qr&utm_campaign=reset-dec-2026&utm_content=slide25#step3"
+  status = 302
+
+[[redirects]]
+  from = "/book-rd"
+  to = "/book?utm_source=rd-training&utm_medium=link&utm_campaign=reset-dec-2026&utm_content=talk"
   status = 302
 
 [[headers]]

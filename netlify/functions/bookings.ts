@@ -46,6 +46,10 @@ export default async (req: Request) => {
   }
 
   if (req.method === "POST") {
+    // The live Book page uses Cal.com, so this endpoint is closed unless the built-in calendar is switched on.
+    if ((Netlify.env.get("BOOKING_PROVIDER") || "cal").toLowerCase() !== "builtin") {
+      return json({ error: "Booking happens on the Book page calendar. This endpoint is closed." }, 410);
+    }
     let body: Record<string, unknown>;
     try {
       body = await req.json();

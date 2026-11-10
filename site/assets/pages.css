@@ -1,0 +1,14 @@
+/* Page-level additions for home, book, thanks, privacy and terms. Loaded after site.css. */
+.site-footer p.fine{flex:1 1 100%;margin:0}
+.book-copy .hero-note{margin-top:-6px}
+.before-book{margin-top:28px;padding-top:20px;border-top:1px solid var(--line)}
+.before-book h3{font-size:22px;margin-bottom:8px}
+.before-book ul{margin:0;padding-left:20px;font-size:14px;color:var(--muted)}
+.before-book li{padding-block:2px}
+.legal{padding-block:72px 96px}
+.legal .stack{gap:14px}
+.legal h1{font-size:clamp(38px,4.6vw,56px)}
+.legal h2{font-size:28px;margin-top:22px}
+.legal ul{margin:0;padding-left:22px}
+.legal li{padding-block:3px}
+.legal .updated{font-size:14px;color:var(--muted)}

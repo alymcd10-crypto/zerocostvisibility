@@ -185,16 +185,19 @@ p{margin:0}
 .tk-section:first-child{border-top:0;padding-top:48px}
 /* Sticky numbered tabs from the mockup */
 .tk-tabs{position:sticky;top:0;z-index:5;background:rgba(248,245,239,.97);border-block:1px solid var(--line)}
-.tk-tabs .wrap{display:flex;align-items:center;gap:8px;overflow-x:auto;padding-block:12px;scrollbar-width:none}
+.tk-tabs .wrap{display:flex;align-items:center;gap:6px;overflow-x:auto;padding-block:12px;scrollbar-width:none}
 .tk-tabs .wrap::-webkit-scrollbar{display:none}
-.tk-tabs a{display:inline-flex;align-items:center;gap:8px;font-size:13.5px;text-decoration:none;white-space:nowrap;padding:9px 16px;border:1px solid var(--line);border-radius:999px;background:var(--white)}
+.tk-tabs a{display:inline-flex;align-items:center;gap:8px;font-size:13.5px;text-decoration:none;white-space:nowrap;padding:9px 11px;border:1px solid var(--line);border-radius:999px;background:var(--white)}
 .tk-tabs a span{font-size:11px;font-weight:600;letter-spacing:1px;color:var(--ink)}
 .tk-tabs a:hover{border-color:var(--ink)}
 .tk-tabs a.is-current{background:var(--navy);border-color:var(--navy);color:var(--paper)}
 .tk-tabs a.is-current span{color:var(--pink)}
 .tk-tabs .tk-print{margin-left:auto;flex-shrink:0;min-height:40px;padding:0 16px;border:0;background:transparent;color:var(--ink);font:500 13px var(--sans);text-decoration:underline;text-underline-offset:4px;cursor:pointer}
 .tk-cta{padding-block:16px 72px}
-@media print{.site-header,.site-footer,.tk-tabs,.tk-cta,.copy-btn{display:none !important}.tk-section{padding-block:24px;break-inside:avoid-page}.tpl{break-inside:avoid}}
+.tk-session-band{margin:0;background:var(--cream);border-bottom:1px solid var(--line);font-size:14.5px}
+.tk-session-band .wrap{display:flex;flex-wrap:wrap;align-items:center;justify-content:space-between;gap:4px 20px;padding-block:6px}
+.tk-session-band a{display:inline-block;padding-block:10px;font-weight:500;color:var(--ink);text-underline-offset:4px}
+@media print{.site-header,.site-footer,.tk-tabs,.tk-cta,.tk-session-band,.copy-btn,.nav,.btn{display:none !important}.tk-section{padding-block:24px;break-inside:avoid-page}.tpl{break-inside:avoid}}
 .tk-section > header{display:flex;flex-direction:column;gap:12px;max-width:720px}
 .tk-section > header p:not(.eyebrow){color:var(--body)}
 .gate-list{margin:0;padding:0;list-style:none;display:flex;flex-direction:column;border-top:1px solid var(--line);align-self:flex-start;flex:1 1 300px}
@@ -223,6 +226,7 @@ p{margin:0}
 .checklist{margin:0;padding:0;list-style:none;display:grid;grid-template-columns:repeat(auto-fill,minmax(360px,1fr));gap:28px 40px}
 .checklist li{display:flex;flex-direction:column;gap:8px;border-top:1px solid var(--ink);padding-top:16px}
 .checklist p{font-size:14.5px}
+.checklist h4{font:600 21px/1.2 var(--display);color:var(--ink);margin:0}
 .timeline{margin:0;padding:0;list-style:none;border-top:1px solid var(--line)}
 .timeline li{display:grid;grid-template-columns:150px minmax(0,1fr);gap:4px 28px;padding:18px 0;border-bottom:1px solid var(--line)}
 .timeline .when{font-size:13px;font-weight:600;color:var(--ink);padding-top:4px}
@@ -295,6 +299,7 @@ button.cal-day[aria-pressed="true"]{background:var(--navy);color:var(--paper)}
 .site-footer{background:var(--navy);color:var(--navy-text);border-top:3px solid var(--pink)}
 .site-footer .wrap{padding-block:36px;display:flex;flex-wrap:wrap;justify-content:space-between;gap:12px 24px;font-size:13px;line-height:1.7}
 .site-footer .fine{color:#B8B0A3}
+.site-footer p.fine{margin:0;flex-basis:100%}
 .site-footer a{color:var(--navy-text);text-underline-offset:3px;display:inline-block;padding-block:8px}
 .site-footer a:hover{color:var(--pink)}
 

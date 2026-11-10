@@ -31,9 +31,9 @@ page.on('pageerror', (e) => consoleErrors.push(`${page.url()}: ${e.message}`));
 page.on('console', (m) => { if (m.type() === 'error' && !/fonts\.g/.test(m.text()) && !/status of 401/.test(m.text())) consoleErrors.push(`${page.url()}: ${m.text()}`); });
 
 // ---- 1. The toolkit is locked: QR link for slide 14 shows the code page at the same URL
-await step('slide 14 QR (/reviews) lands on the code page, toolkit HTML not sent', async () => {
+await step('slide 25 QR (/reviews) lands on the code page, toolkit HTML not sent', async () => {
   await page.goto(`${BASE}/reviews`);
-  assert.match(page.url(), /\/toolkit\/\?utm_source=starpower.*utm_content=slide14#step3$/);
+  assert.match(page.url(), /\/toolkit\/\?utm_source=rd-training.*utm_content=slide25#step3$/);
   assert.equal(await page.locator('#gate-title').innerText(), 'Enter your attendee code');
   assert.ok(await page.locator('#gate-hint').isVisible(), 'deep-link hint visible');
   const html = await (await fetch(`http://localhost:${PORT}/toolkit/`)).text();
@@ -50,22 +50,39 @@ await step('wrong code shows an error and is tracked', async () => {
   assert.ok((await events(page)).some(([n]) => n === 'toolkit_code_fail'));
 });
 
-await step('right code (lower case) unlocks and lands on the review request (#step3)', async () => {
-  await page.fill('#gate-code', ' starpower ');
+await step('right code (lower case, with spaces) unlocks and lands on the review request (#step3)', async () => {
+  await page.fill('#gate-code', ' rdtraining 2026 ');
   await Promise.all([page.waitForURL(/#step3$/), page.waitForLoadState('load'), page.click('#gate-form button[type=submit]')]);
   await page.locator('#tpl-review').waitFor();
   await page.waitForTimeout(400);
   const top = await page.locator('#step3').evaluate((el) => el.getBoundingClientRect().top);
   assert.ok(top > -5 && top < 200, `#step3 top at ${top}`);
   const s = await state();
-  assert.ok(s.forms.some((f) => f['form-name'] === 'toolkit-access' && f.email === 'agent@example.com'), 'Netlify form submitted');
-  assert.deepEqual(s.access.at(-1), { email: 'agent@example.com', source: 'slide14' });
+  const gateForm = s.forms.find((f) => f['form-name'] === 'toolkit-access' && f.email === 'agent@example.com');
+  assert.ok(gateForm, 'Netlify form submitted');
+  assert.ok(!('code' in gateForm), 'code field must not go to Netlify Forms');
+  const ft = await page.evaluate(() => JSON.parse(localStorage.getItem('zcv-first-touch-v1') || '{}'));
+  assert.ok(ft.utm_source === 'rd-training' && ft.utm_content === 'slide25', 'first-touch utm stored');
+  assert.deepEqual(s.access.at(-1), { email: 'agent@example.com', source: 'slide25' });
 });
 
-await step('closing-slide QR (/starpower) opens the toolkit directly once unlocked', async () => {
-  await page.goto(`${BASE}/starpower`);
-  assert.match(page.url(), /utm_content=closing-slide/);
+await step('slide 30 QR (/rd) opens the toolkit once unlocked; /starpower still forwards; STARPOWER still unlocks', async () => {
+  await page.goto(`${BASE}/rd`);
+  assert.match(page.url(), /\/toolkit\/\?.*utm_content=closing-slide/);
   assert.ok(await page.locator('#tk-title').isVisible());
+  await page.goto(`${BASE}/starpower`);
+  assert.match(page.url(), /\/toolkit\//);
+  assert.ok(await page.locator('#tk-title').isVisible());
+  const fresh = await browser.newContext({ viewport: { width: 1280, height: 900 } });
+  await fresh.addInitScript(() => { window.__SITE_LIVE__ = true; });
+  await fresh.route('https://www.googletagmanager.com/**', (r) => r.fulfill({ contentType: 'text/javascript', body: '' }));
+  const p = await fresh.newPage();
+  await p.goto(`${BASE}/starpower`);
+  await p.fill('#gate-email', 'old@example.com');
+  await p.fill('#gate-code', 'STARPOWER');
+  await Promise.all([p.waitForLoadState('load'), p.click('#gate-form button[type=submit]')]);
+  await p.locator('#tk-title').waitFor();
+  await fresh.close();
 });
 
 // ---- 2. Every internal link resolves, and every #anchor exists on its target page
@@ -76,7 +93,7 @@ for (const p of pages) {
   await page.goto(BASE + p);
   const links = await page.$$eval('a[href]', (as) => as.map((a) => [a.getAttribute('href'), a.getAttribute('rel') || '']));
   for (const [href, rel] of new Map(links)) {
-    if (/^(tel|mailto):/.test(href)) continue;
+    if (/^(tel|mailto):/.test(href) || /^(https?:)?\/\//.test(href) || /^blob:/.test(href)) continue; // external and blob: links are not internal
     linkCount++;
     const url = new URL(href, BASE + p);
     // The one outside link we mean to have: the RD Training Systems partner site. It must open safely.
@@ -161,7 +178,7 @@ await step('built pages carry the site address, the sitemap is right, robots kee
   const offers = ld['@graph'].find((n) => n['@type'] === 'ProfessionalService').makesOffer.map((o) => [o.name, o.price]);
   assert.deepEqual(offers, [['The Zero-Cost Visibility Session', '297']]);
   const sitemap = await (await ctx.request.get(BASE + '/sitemap.xml')).text();
-  assert.deepEqual([...sitemap.matchAll(/<loc>([^<]+)<\/loc>/g)].map((m) => m[1]), [`${siteUrl}/`, `${siteUrl}/book`]);
+  assert.deepEqual([...sitemap.matchAll(/<loc>([^<]+)<\/loc>/g)].map((m) => m[1]), [`${siteUrl}/`, `${siteUrl}/book`, `${siteUrl}/privacy`, `${siteUrl}/terms`]);
   const robots = await (await ctx.request.get(BASE + '/robots.txt')).text();
   for (const path of ['/toolkit/', '/attendee/', '/thanks']) assert.ok(robots.includes(`Disallow: ${path}`), path);
 });
@@ -175,7 +192,11 @@ await step('copy rules: no em dashes, banned words or "coach" in visible text; t
     const text = (await page.evaluate(() => document.body.innerText + ' ' + document.title + ' ' +
       [...document.querySelectorAll('meta[name="description"], meta[property^="og:"]')].map((m) => m.content).join(' ')))
       .replace('Not a coach. A working agent', '');
-    for (const bad of ['—', 'elevate', 'unlock', 'leverage', 'game-changer', 'coach', '90-day', '90 day', '61–90', 'week by week']) {
+    // "90 day" is banned on public pages only: the retired "90-day plan" offer. The deck's self-score
+    // (appendix A-12) legitimately says "Your lowest category is your next 90 days" inside the toolkit.
+    const banned = ['—', 'elevate', 'unlock', 'leverage', 'game-changer', 'coach', '90-day', '61–90', 'week by week'];
+    if (p !== '/toolkit/') banned.push('90 day');
+    for (const bad of banned) {
       if (text.toLowerCase().includes(bad)) problems.push(`${p}: "${bad}"`);
     }
     // Say each thing once: these appear at most once per page
@@ -230,27 +251,32 @@ await step('each toolkit tab scrolls to its section and highlights', async () =>
   await page.goto(BASE + '/toolkit/');
   for (const id of ['step1', 'step2', 'step3', 'ai', 'calendar']) {
     await page.locator(`.tk-tabs a[href="#${id}"]`).click();
-    await page.waitForTimeout(700);
+    // The page scrolls smoothly, so a far section takes longer than a fixed wait: wait until it has arrived.
+    await page.waitForFunction((sel) => { const t = document.querySelector(sel).getBoundingClientRect().top; return t > -5 && t < 200; }, '#' + id, { timeout: 8000 });
+    await page.waitForTimeout(250);
     const top = await page.locator('#' + id).evaluate((el) => el.getBoundingClientRect().top);
     assert.ok(top > -5 && top < 200, `#${id} top ${top}`);
     assert.equal(await page.locator(`.tk-tabs a[href="#${id}"]`).getAttribute('aria-current'), 'true', `${id} tab highlighted`);
   }
 });
 
-await step('all 13 copy buttons copy the exact template text', async () => {
+await step('every copy button copies the exact text of its template element', async () => {
   await page.goto(BASE + '/toolkit/');
   const ids = await page.$$eval('[data-copy]', (bs) => bs.map((b) => b.dataset.copy));
-  assert.equal(ids.length, 13);
+  assert.ok(ids.length >= 13, `only ${ids.length} copy buttons`);
+  assert.equal(new Set(ids).size, ids.length, 'every copy button has its own template');
   for (const id of ids) {
+    assert.equal(await page.locator('#' + id).count(), 1, `${id} template element exists once`);
     const btn = page.locator(`[data-copy="${id}"]`);
     await btn.click();
     await page.waitForFunction((el) => el.textContent === 'Copied', await btn.elementHandle(), { timeout: 2000 });
     const clip = await page.evaluate(() => navigator.clipboard.readText());
     const text = (await page.locator('#' + id).innerText()).trim();
+    assert.ok(text.length > 20, `${id} has text`);
     assert.equal(clip, text, `${id} clipboard`);
   }
   const copies = (await events(page)).filter(([n]) => n === 'copy_template');
-  assert.equal(copies.length, 13);
+  assert.equal(copies.length, ids.length);
   assert.ok(copies.every(([, d]) => d.template_name && d.section), 'events carry template name and section');
 });
 
@@ -312,7 +338,7 @@ await step('with a Cal.com link set, the Book page uses Cal.com instead of the b
   const inline = queued.find(([cmd]) => cmd === 'inline');
   assert.deepEqual(inline && [inline[1].elementOrSelector, inline[1].calLink], ['#booking-embed', 'liz-federman/visibility-session']);
   assert.ok(queued.some(([cmd, o]) => cmd === 'on' && o.action === 'bookingSuccessfulV2'), 'booking tracked');
-  assert.match(await cal.locator('#booking-note').innerText(), /calendar invite right away/);
+  assert.match(await cal.locator('#booking-note').innerText(), /calendar invite with the video link/);
   await cal.close();
 });
 
