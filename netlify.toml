@@ -66,6 +66,13 @@
   status = 301
   force = true
 
+# Phase 1 shows only the 1:1 session. The Setup page is saved in phase2/ for later;
+# old links to /setup land on the Book page.
+[[redirects]]
+  from = "/setup"
+  to = "/book"
+  status = 302
+
 [[redirects]]
   from = "/toolkit"
   to = "/toolkit/"
@@ -75,6 +82,11 @@
 [[redirects]]
   from = "/starpower"
   to = "/toolkit/?utm_source=starpower&utm_medium=qr&utm_campaign=starpower2026&utm_content=closing-slide"
+  status = 302
+
+[[redirects]]
+  from = "/rd"
+  to = "/toolkit/?utm_source=rd-training&utm_medium=link&utm_campaign=rd2026&utm_content=short-link"
   status = 302
 
 [[redirects]]
