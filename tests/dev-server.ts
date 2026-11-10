@@ -5,14 +5,17 @@ import { createServer } from "node:http";
 import { readFile, stat } from "node:fs/promises";
 import { extname, join, normalize } from "node:path";
 import {
-  DEFAULT_CODE, codeMatches, cookieHeader, createToken, readCookie, signingSecret, verifyToken,
+  CODE_MISMATCH_MESSAGE, anyCodeMatches, cookieHeader, createToken, readCookie, toolkitCodes, toolkitSecret, verifyToken,
 } from "../netlify/lib/access-token.ts";
 import { BOOKING_RULES, bookableRange, slotError } from "../netlify/lib/booking-rules.ts";
 
 // Serves the built site (npm run build) so {{SITE_URL}} is filled in as on Netlify.
 const ROOT = new URL("../dist/", import.meta.url).pathname;
 const PORT = Number(process.argv[2] ?? 8888);
-const SECRET = signingSecret(undefined, DEFAULT_CODE);
+process.env.BOOKING_PROVIDER = "builtin"; // the dev server stands in for the built-in calendar
+const env = (k: string) => process.env[k];
+const CODES = toolkitCodes(() => undefined); // built-in defaults: RDTraining2026 and STARPOWER
+const SECRET = toolkitSecret(() => undefined);
 const TYPES: Record<string, string> = {
   ".html": "text/html; charset=utf-8", ".css": "text/css", ".js": "text/javascript", ".svg": "image/svg+xml",
   ".png": "image/png", ".jpg": "image/jpeg", ".ico": "image/x-icon", ".xml": "application/xml", ".txt": "text/plain",
@@ -48,7 +51,7 @@ createServer(async (req, res) => {
   if (url.pathname === "/api/toolkit-access" && req.method === "POST") {
     const b = JSON.parse(body || "{}");
     if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(b.email ?? "")) return send(400, { error: "Please enter a valid email." });
-    if (!codeMatches(b.code ?? "", DEFAULT_CODE)) return send(401, { error: "That code doesn't match. It's on Liz's closing slide." });
+    if (!anyCodeMatches(b.code ?? "", CODES)) return send(401, { error: CODE_MISMATCH_MESSAGE });
     access.push({ email: b.email, source: b.source ?? "" });
     // Plain http in the test, so the Secure flag is dropped here only.
     return send(200, { ok: true }, { "Set-Cookie": cookieHeader(await createToken(SECRET)).replace("; Secure", "") });
@@ -59,6 +62,7 @@ createServer(async (req, res) => {
     if (req.method === "GET") {
       return send(200, { rules: { ...BOOKING_RULES, ...bookableRange(BOOKING_RULES) }, taken: active.map(({ date, time }) => ({ date, time })) });
     }
+    if ((env("BOOKING_PROVIDER") || "cal") !== "builtin") return send(410, { error: "Booking happens on the Book page calendar. This endpoint is closed." });
     const b = JSON.parse(body || "{}");
     const err = slotError(BOOKING_RULES, b.date, b.time);
     if (err) return send(400, { error: err });

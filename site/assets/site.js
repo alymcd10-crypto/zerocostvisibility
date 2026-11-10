@@ -4,8 +4,9 @@
   var CONFIG = window.SITE_CONFIG || {};
   var CONTACT_EMAIL = 'liz@listingsbyleslie.com';
 
-  // Forms and analytics only run on the real site (or when the end-to-end test sets __SITE_LIVE__)
-  var isLive = window.__SITE_LIVE__ === true || /(^|\.)zerocostvisibility\.com$|netlify\.app$/.test(location.hostname);
+  // Forms and analytics only run on the production hostnames (or when the end-to-end test sets
+  // __SITE_LIVE__), so deploy previews and branch deploys send no GA4 data and no form emails.
+  var isLive = window.__SITE_LIVE__ === true || /^(www\.)?zerocostvisibility\.com$|^zerocostvisibility\.netlify\.app$/.test(location.hostname);
   var reduceMotion = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
   var params = new URLSearchParams(location.search);
 
@@ -25,6 +26,27 @@
     try { window.gtag('event', name, data || {}); } catch (e) {}
   }
 
+  // First-touch UTM tags: kept in localStorage so a lead or unlock later in the visit
+  // (or on a return visit) still credits the QR code or link that first brought the person.
+  var UTM_KEY = 'zcv-first-touch-v1';
+  var firstTouch = {};
+  try {
+    firstTouch = JSON.parse(localStorage.getItem(UTM_KEY) || '{}') || {};
+    if (!firstTouch.utm_source && params.get('utm_source')) {
+      firstTouch = {};
+      ['utm_source', 'utm_medium', 'utm_campaign', 'utm_content'].forEach(function (k) {
+        if (params.get(k)) firstTouch[k] = params.get(k).slice(0, 100);
+      });
+      localStorage.setItem(UTM_KEY, JSON.stringify(firstTouch));
+    }
+  } catch (e) {}
+  function withFirstTouch(data) {
+    var out = data || {};
+    if (firstTouch.utm_source) out.utm_source = firstTouch.utm_source;
+    if (firstTouch.utm_content) out.utm_content = firstTouch.utm_content;
+    return out;
+  }
+
   // Any link or button with data-track="event_name" (and optional data-track-location) is tracked.
   // Phone and email links are tracked as contact_click.
   document.addEventListener('click', function (e) {
@@ -37,16 +59,16 @@
     }
   });
 
-  function encode(form) {
-    return new URLSearchParams(new FormData(form)).toString();
-  }
-
-  function submitToNetlify(form) {
+  // skip: field names left out of the post (the gate's code field never goes to Netlify Forms)
+  function submitToNetlify(form, skip, extra) {
     if (!isLive) return Promise.resolve('preview');
+    var body = new URLSearchParams(new FormData(form));
+    (skip || []).forEach(function (k) { body.delete(k); });
+    Object.keys(extra || {}).forEach(function (k) { body.set(k, extra[k]); });
     return fetch('/', {
       method: 'POST',
       headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
-      body: encode(form)
+      body: body.toString()
     }).then(function (r) { if (!r.ok) throw new Error('Form error ' + r.status); return 'sent'; });
   }
 
@@ -113,9 +135,10 @@
       }).then(function (r) {
         return r.json().catch(function () { return {}; }).then(function (data) {
           if (r.ok) {
-            track('toolkit_unlock', { source: source });
-            // Adds the attendee to Liz's Netlify form list; the unlock never waits on it.
-            var sent = submitToNetlify(gate).catch(function () {});
+            track('toolkit_unlock', withFirstTouch({ source: source }));
+            // Adds the attendee (email and source only, never the code) to Liz's Netlify form list;
+            // the unlock never waits on it. Notifications for this form stay off.
+            var sent = submitToNetlify(gate, ['code', 'company-website'], { source: source }).catch(function () {});
             var go = function () {
               // Reloading would put the visitor back where they were on the code page;
               // the toolkit scrolls to the #section itself.
@@ -161,7 +184,7 @@
       }, { rootMargin: '-120px 0px -60% 0px' });
       Object.keys(byId).forEach(function (id) { var s = document.getElementById(id); if (s) io.observe(s); });
     }
-    // Arriving from the slide 14 QR code (#step3) right after unlocking: land on the section
+    // Arriving from the slide 25 QR code (#step3) right after unlocking: land on the section
     if (location.hash) {
       var target = document.getElementById(decodeURIComponent(location.hash.slice(1)));
       var jump = function () { target.scrollIntoView({ block: 'start', behavior: 'instant' }); };
@@ -190,9 +213,9 @@
   // ---- Contact form ---------------------------------------------------------
   var contact = document.getElementById('contact-form');
   if (contact) {
-    // /book?topic=setup#contact (or #contact?topic=setup) preselects the Setup topic
+    // /book?topic=session#contact (or #contact?topic=session) preselects the topic
     var topic = params.get('topic') || new URLSearchParams(location.hash.split('?')[1] || '').get('topic');
-    var topics = { setup: 'The Visibility Setup' };
+    var topics = { session: 'Booking a Zero-Cost Visibility Session', speaking: 'Speaking at my event' };
     if (topic && topics[topic]) contact.elements['topic'].value = topics[topic];
     if (/^#contact\?/.test(location.hash)) {
       var contactSection = document.getElementById('contact');
@@ -204,7 +227,7 @@
       var btn = contact.querySelector('button[type="submit"]');
       btn.disabled = true;
       submitToNetlify(contact).then(function (state) {
-        track('generate_lead', { form: 'contact', topic: contact.elements['topic'].value });
+        track('generate_lead', withFirstTouch({ form: 'contact', topic: contact.elements['topic'].value }));
         contact.hidden = true;
         msg.hidden = false;
         msg.textContent = state === 'preview'
@@ -233,7 +256,7 @@
   }
   if (embedBox && provider !== 'built-in') {
     var note = document.getElementById('booking-note');
-    if (note) note.innerHTML = 'You pay when you book and get a calendar invite right away. None of these times work? <a href="#contact">Send a note</a> with a few that do.';
+    if (note) note.innerHTML = 'You pay when you book and get a calendar invite with the video link. None of these times work? <a href="#contact">Send a note</a> with a few that do.';
   }
 
   // Passes the visit's UTM tags through so bookings show which slide or link they came from.
@@ -255,7 +278,7 @@
     window.addEventListener('message', function (e) {
       if (e.origin !== 'https://calendly.com' || !e.data || typeof e.data.event !== 'string') return;
       if (e.data.event === 'calendly.date_and_time_selected') track('booking_time_selected', { method: 'calendly' });
-      if (e.data.event === 'calendly.event_scheduled') track('generate_lead', { form: 'booking', method: 'calendly' });
+      if (e.data.event === 'calendly.event_scheduled') track('generate_lead', withFirstTouch({ form: 'booking', method: 'calendly' }));
     });
   }
 
@@ -264,7 +287,7 @@
     window.Cal('init', { origin: 'https://cal.com' });
     window.Cal('inline', { elementOrSelector: '#' + box.id, calLink: link, layout: 'month_view' });
     var booked = false;
-    var onBooked = function () { if (!booked) { booked = true; track('generate_lead', { form: 'booking', method: 'cal' }); } };
+    var onBooked = function () { if (!booked) { booked = true; track('generate_lead', withFirstTouch({ form: 'booking', method: 'cal' })); } };
     window.Cal('on', { action: 'bookingSuccessfulV2', callback: onBooked });
     window.Cal('on', { action: 'bookingSuccessful', callback: onBooked });
 
@@ -431,7 +454,7 @@
 
       function booked(held) {
         if (held) taken[iso(selected) + '|' + slot] = true;
-        track('generate_lead', { form: 'booking', method: 'built-in' });
+        track('generate_lead', withFirstTouch({ form: 'booking', method: 'built-in' }));
         root.querySelector('.booker-picker').hidden = true;
         form.hidden = true;
         status.hidden = false;
@@ -452,4 +475,95 @@
       status.innerHTML = 'The calendar didn’t load. <a href="#contact">Send a note</a> with a few days and times that work, and Liz will reply within two business days.';
     });
   }
+})();
+
+// ---- Toolkit: blank tracker and self-score (page-specific, no effect elsewhere) ----
+(function () {
+  function say(btn, text, ms) {
+    var label = btn.getAttribute('data-label') || btn.textContent;
+    btn.setAttribute('data-label', label);
+    btn.textContent = text;
+    setTimeout(function () { btn.textContent = label; btn.classList.remove('done'); }, ms || 2200);
+  }
+
+  // Blank tracker: the CSV link works without JavaScript; the copy button only appears with it.
+  var csv = document.getElementById('tracker-csv');
+  var copyTable = document.getElementById('tracker-copy');
+  var heads = Array.prototype.map.call(document.querySelectorAll('table.tracker thead th'), function (th) { return th.textContent.trim(); }).slice(0, 7);
+  if (csv && heads.length === 7 && window.Blob && window.URL && URL.createObjectURL) {
+    // A Blob link downloads more reliably on phones than a data link
+    csv.href = URL.createObjectURL(new Blob([heads.join(',') + '\n'], { type: 'text/csv;charset=utf-8' }));
+  }
+  if (copyTable && heads.length === 7) {
+    copyTable.hidden = false;
+    copyTable.addEventListener('click', function () {
+      var text = heads.join('\t') + '\n';
+      var ok = function () { copyTable.classList.add('done'); say(copyTable, 'Copied', 2200); };
+      var fail = function () { say(copyTable, 'Copy not available. Use the CSV download.', 4000); };
+      if (navigator.clipboard && navigator.clipboard.writeText) navigator.clipboard.writeText(text).then(ok, fail);
+      else fail();
+    });
+  }
+
+  // Self-score
+  var form = document.getElementById('selfscore-form');
+  if (!form) return;
+  var KEY = 'zcv-selfscore-v1';
+  var cats = Array.prototype.slice.call(form.querySelectorAll('.sc-cat'));
+  var bands = Array.prototype.slice.call(document.querySelectorAll('.band-list li'));
+  var totalEl = document.getElementById('sc-total');
+  var progressEl = document.getElementById('sc-progress');
+  var msgEl = document.getElementById('sc-message');
+  var resetBtn = document.getElementById('sc-reset');
+
+  function save() {
+    try {
+      var data = {};
+      Array.prototype.forEach.call(form.querySelectorAll('input[type="radio"]:checked'), function (r) { data[r.name] = r.value; });
+      localStorage.setItem(KEY, JSON.stringify(data));
+    } catch (e) {}
+  }
+  function load() {
+    try {
+      var data = JSON.parse(localStorage.getItem(KEY) || '{}');
+      Object.keys(data).forEach(function (name) {
+        var r = form.querySelector('input[name="' + name + '"][value="' + data[name] + '"]');
+        if (r) r.checked = true;
+      });
+    } catch (e) {}
+  }
+  function update() {
+    var total = 0, answered = 0, sums = [], complete = true;
+    cats.forEach(function (cat) {
+      var sum = 0, n = 0;
+      Array.prototype.forEach.call(cat.querySelectorAll('input[type="radio"]:checked'), function (r) { sum += +r.value; n++; });
+      sums.push(sum); total += sum; answered += n;
+      if (n < 4) complete = false;
+      cat.querySelector('.sc-total').textContent = n ? String(sum) : 'not scored';
+      cat.classList.remove('is-lowest');
+      cat.querySelector('.sc-flag').hidden = true;
+    });
+    totalEl.textContent = answered ? String(total) : 'not scored';
+    progressEl.textContent = 'Answered ' + answered + ' of 16';
+    resetBtn.hidden = answered === 0;
+    bands.forEach(function (b) { b.classList.remove('is-current'); });
+    if (!complete) {
+      msgEl.textContent = answered ? 'Answer all 16 to see your band and your lowest category.' : '';
+      return;
+    }
+    var low = Math.min.apply(null, sums), names = [];
+    cats.forEach(function (cat, i) {
+      if (sums[i] === low) { cat.classList.add('is-lowest'); cat.querySelector('.sc-flag').hidden = false; names.push(cat.getAttribute('data-cat')); }
+    });
+    bands.forEach(function (b) { if (total >= +b.getAttribute('data-min') && total <= +b.getAttribute('data-max')) b.classList.add('is-current'); });
+    msgEl.textContent = 'Your lowest category' + (names.length > 1 ? ' (tied)' : '') + ': ' + names.join(' and ') + '. That is your next 90 days.';
+  }
+  load();
+  update();
+  form.addEventListener('change', function () { save(); update(); });
+  resetBtn.addEventListener('click', function () {
+    form.reset();
+    try { localStorage.removeItem(KEY); } catch (e) {}
+    update();
+  });
 })();

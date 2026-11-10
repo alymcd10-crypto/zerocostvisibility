@@ -9,26 +9,30 @@ Data lives in Netlify Database. Its tables are created and updated automatically
 
 **Deploys come from GitHub.** Every push to `main` deploys automatically. Don't drag a folder into Netlify: a manual upload doesn't include the server code or run the database migrations.
 
+## Phase 1 and Phase 2
+This branch is **Phase 1**: the site offers only the 1:1 session with Liz. The Visibility Setup page is saved in `phase2/setup.html` (not published), and `/setup` forwards to `/book`. The full version with the Setup is what's on `main` today; to bring it back, restore `phase2/setup.html` to `site/`, re-add the Setup card, menu link, contact topic, credit line and JSON-LD offer, and remove the `/setup` redirect in `netlify.toml`.
+
 ## Pages
 | URL | What it is |
 |---|---|
 | `/` | Home |
-| `/setup` | The Visibility Setup: the done-for-you offer, $997 founding price |
 | `/book` | Book the Visibility Audit (Cal.com calendar) and the contact form. `/book?topic=setup#contact` preselects the Setup in the contact form |
-| `/toolkit/` | Starpower attendee toolkit. Locked; visitors without access see the code page at the same address |
+| `/toolkit/` | Attendee toolkit for RD Training Systems sessions and other talks. Locked; visitors without access see the code page at the same address |
 | `/attendee/` | The code page itself |
 | `/thanks.html` | Fallback thank-you page for the contact form |
-| `/starpower` | Short link for the QR code on the closing slide |
-| `/reviews` | Short link for the QR code on slide 14 (opens the review request) |
+| `/starpower` | Legacy short link, kept so older QR codes keep working (forwards to the toolkit) |
+| `/rd` | Slide 30 QR code and the link to say out loud (`utm_content=closing-slide`) |
+| `/rd-binder` | Link for the attendee binder (`utm_content=binder`) |
+| `/reviews` | Slide 25 QR code (opens the review request, `utm_content=slide25#step3`) |
+| `/book-rd` | Link to the Book page for the talk (`utm_content=talk`) |
 
 ## One-time setup in Netlify (about 20 minutes)
 1. **Connect the repo.** Project configuration > Build & deploy > Link repository > GitHub > `zerocostvisibility`. Set branch `main`. Leave the build settings alone: `netlify.toml` sets the build command (`node scripts/build.mjs`) and publish directory (`dist`).
-2. **Attendee code.** Project configuration > Environment variables > Add:
-   - `TOOLKIT_CODE` = `STARPOWER` (or whatever is on the closing slide; not case sensitive)
-   - `TOOLKIT_SECRET` = any long random text, 32+ characters. A password manager's generator works. This signs the "already entered the code" cookie.
-
-   Changing either value signs everyone out, so they'd need the code again.
-3. **Form emails.** Forms > Form notifications > Email notification for `booking`, `contact` and `toolkit-access`, sent to the address that should receive them.
+2. **Attendee codes.** Project configuration > Environment variables > Add:
+   - `TOOLKIT_CODES` = `RDTraining2026,STARPOWER` (comma separated; any of them unlocks the toolkit). Matching ignores case, spaces, hyphens and dashes, and reads the letter O as the digit 0, so " rdtraining 2026 " and "RDTraining2O26" both work. If you set nothing, the built-in defaults are `RDTraining2026` and `STARPOWER`. The older single `TOOLKIT_CODE` still works when `TOOLKIT_CODES` is not set.
+   - `TOOLKIT_SECRET` = any long random text, 16+ characters (32+ is better). A password manager's generator works. This signs the "already entered the code" cookie. **Set it.** With it set, adding or removing a code never signs anyone out. Without it, the cookie is signed with a key derived from the first (primary) code in the list, so adding a code at the end is safe but changing the first code signs everyone out.
+3. **Form emails.** Forms > Form notifications > Email notification for `booking` and `contact` only, sent to the address that should receive them. Do **not** turn on notifications for `toolkit-access`: a room of attendees unlocking the toolkit would send hundreds of emails. The email list lives in the database (`toolkit_access`); the Netlify `toolkit-access` form only keeps email and source, never the code.
+   - `BOOKING_PROVIDER` (optional) = `builtin` only if you switch the Book page back to the built-in calendar. By default (Cal.com) `POST /api/bookings` answers 410 so nobody can fill the old calendar.
 4. **Domain (later).** See **Site address and domains** below.
 
 ## Site address and domains
@@ -59,13 +63,13 @@ The site's address is set in one place: `siteUrl` in `site.config.json`, current
 - **Calendly** (`bookingProvider: 'calendly'`, `bookingUrl: 'https://calendly.com/…'`): taking payment at booking needs Calendly Standard ($10/mo).
 
 ## Google Analytics 4 and Search Console
-1. **GA4:** analytics.google.com > Admin > Create property > Web data stream for zerocostvisibility.com. Copy the measurement ID (`G-…`) into `ga4Id` in `site/assets/config.js`. Tracking only runs on the live site.
+1. **GA4:** analytics.google.com > Admin > Create property > Web data stream for zerocostvisibility.com. Copy the measurement ID (`G-…`) into `ga4Id` in `site/assets/config.js`. Tracking only runs on the production hostnames (`zerocostvisibility.netlify.app` and `zerocostvisibility.com`), so deploy previews send no data.
 2. **Key events:** in GA4 > Admin > Data display > Events, turn on **Mark as key event** for `generate_lead` (booking or contact form sent; contact forms carry the `topic`, so Setup inquiries show up as `topic = The Visibility Setup`), `toolkit_unlock` (attendee entered the code) and `booking_time_selected` (a visitor picked a time). Note: Cal.com's embed doesn't report a time being picked, so with Cal.com `booking_time_selected` stays at zero, and finished Cal.com bookings arrive as `generate_lead` with `method = cal`.
 3. **Events the site sends:**
 
    | Event | When | Details |
    |---|---|---|
-   | `toolkit_unlock` | Attendee entered the right code | `source` = which QR code |
+   | `toolkit_unlock` | Attendee entered the right code | `source` = which QR code; `utm_source`, `utm_content` = first touch |
    | `toolkit_code_fail` | Wrong code entered | |
    | `copy_template` | A template was copied | `template_name`, `section` |
    | `print_toolkit` | Print or save PDF | |
@@ -73,17 +77,17 @@ The site's address is set in one place: `siteUrl` in `site.config.json`, current
    | `view_setup_pricing` | The price block on /setup scrolled into view (once per page view) | |
    | `booking_embed_fallback` | The Cal.com calendar didn't load within 8 seconds and the fallback showed | `reason` = `timeout` or `link_failed` |
    | `booking_time_selected` | A time was picked | `method` |
-   | `generate_lead` | Booking or contact form sent | `form`, `method` |
+   | `generate_lead` | Booking or contact form sent | `form`, `method`, plus first-touch `utm_source`, `utm_content` |
    | `contact_click` | Phone or email link tapped | `method` |
 
-   **UTM convention for QR codes and links:** `utm_source` = where it was shown (`starpower`), `utm_medium` = the channel (`qr`), `utm_campaign` = the event and year (`starpower2026`), `utm_content` = the exact spot (`closing-slide`, `slide14`). The short links `/starpower` and `/reviews` add these tags; reuse the pattern for future talks (for example `/rotary` → `utm_source=rotary&utm_medium=qr&utm_campaign=rotary2027&utm_content=closing-slide`). Scans show up in Acquisition > Traffic acquisition under the campaign name, and the toolkit unlock event carries `utm_content` as `source`.
+   **UTM convention for QR codes and links:** `utm_source` = where it was shown (`rd-training`), `utm_medium` = the channel (`qr`, `print`, `link`), `utm_campaign` = the event (`reset-dec-2026`), `utm_content` = the exact spot (`closing-slide`, `slide25`, `binder`, `talk`). The short links `/rd`, `/rd-binder`, `/reviews` and `/book-rd` add these tags; the first tags a visitor arrives with are kept in the browser and sent with `toolkit_unlock` and `generate_lead`; reuse the pattern for future talks (for example `/rotary` → `utm_source=rotary&utm_medium=qr&utm_campaign=rotary2027&utm_content=closing-slide`). Scans show up in Acquisition > Traffic acquisition under the campaign name, and the toolkit unlock event carries `utm_content` as `source`.
 4. **Search Console:** while the site is on netlify.app, use Add property > **URL prefix** > `https://zerocostvisibility.netlify.app/`, verified with the HTML tag method: paste the `<meta>` tag at the marked spot in `site/index.html`. Then go to Sitemaps and submit `sitemap.xml`. Once you own a domain, add it as a Domain property and verify it with a DNS TXT record.
 
 ## Who opened the toolkit
-Netlify > Database > `toolkit_access` lists every email that entered the right code, with the QR code it came from. The same people also appear under Forms > `toolkit-access`.
+Netlify > Database > `toolkit_access` lists every email that entered the right code, with the QR code it came from. The same people also appear under Forms > `toolkit-access` (email and source only), with notifications off.
 
 ## Test before Nov 7
-- Scan both QR codes from a printed slide, on cellular, not Wi-Fi. Slide 14 should land on the review request after the code.
+- Scan both QR codes from a printed slide, on cellular, not Wi-Fi. Slide 25 should land on the review request after the code.
 - Enter a wrong code, then the right one. Copy a template and paste it into a text.
 - Request a time on the Book page and confirm the email arrives. Then set that booking to `cancelled` and check the time opens up again.
 - Submit the contact form and confirm the email arrives.

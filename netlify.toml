@@ -66,6 +66,13 @@
   status = 301
   force = true
 
+# Phase 1 shows only the 1:1 session. The Setup page is saved in phase2/ for later;
+# old links to /setup land on the Book page.
+[[redirects]]
+  from = "/setup"
+  to = "/book"
+  status = 302
+
 [[redirects]]
   from = "/toolkit"
   to = "/toolkit/"
@@ -74,12 +81,27 @@
 # Short links printed as QR codes in Liz's deck (UTM tags show which slide drove the scan)
 [[redirects]]
   from = "/starpower"
-  to = "/toolkit/?utm_source=starpower&utm_medium=qr&utm_campaign=starpower2026&utm_content=closing-slide"
+  to = "/toolkit/?utm_source=rd-training&utm_medium=qr&utm_campaign=reset-dec-2026&utm_content=legacy-starpower"
+  status = 302
+
+[[redirects]]
+  from = "/rd"
+  to = "/toolkit/?utm_source=rd-training&utm_medium=qr&utm_campaign=reset-dec-2026&utm_content=closing-slide"
+  status = 302
+
+[[redirects]]
+  from = "/rd-binder"
+  to = "/toolkit/?utm_source=rd-training&utm_medium=print&utm_campaign=reset-dec-2026&utm_content=binder"
   status = 302
 
 [[redirects]]
   from = "/reviews"
-  to = "/toolkit/?utm_source=starpower&utm_medium=qr&utm_campaign=starpower2026&utm_content=slide14#step3"
+  to = "/toolkit/?utm_source=rd-training&utm_medium=qr&utm_campaign=reset-dec-2026&utm_content=slide25#step3"
+  status = 302
+
+[[redirects]]
+  from = "/book-rd"
+  to = "/book?utm_source=rd-training&utm_medium=link&utm_campaign=reset-dec-2026&utm_content=talk"
   status = 302
 
 [[headers]]

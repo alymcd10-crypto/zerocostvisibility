@@ -1,16 +1,39 @@
 import { test } from "node:test";
 import assert from "node:assert/strict";
-import { codeMatches, createToken, readCookie, signingSecret, verifyToken } from "../netlify/lib/access-token.ts";
+import { DEFAULT_CODES, anyCodeMatches, codeMatches, createToken, normalizeCode, readCookie, signingSecret, toolkitCodes, toolkitSecret, verifyToken } from "../netlify/lib/access-token.ts";
 import { BOOKING_RULES, bookableRange, slotError, todayIn } from "../netlify/lib/booking-rules.ts";
 
-test("attendee code is case and space insensitive", () => {
+test("both attendee codes work, ignoring case, spaces, hyphens, dashes and O/0", () => {
+  const codes = toolkitCodes(() => undefined);
+  assert.deepEqual(codes, ["RDTraining2026", "STARPOWER"]);
+  for (const given of ["RDTraining2026", " rdtraining 2026 ", "RD-Training-2026", "rd\u2013training\u20142026", "RDTraining2O26", "rdtraining2026", "STARPOWER", " star power ", "star-power", "STARP0WER"]) {
+    assert.ok(anyCodeMatches(given, codes), `should match: ${given}`);
+  }
+  for (const given of ["", "   ", "RDTraining2025", "RDTraining202", "STARPOWE", "starpowers", "nope"]) {
+    assert.ok(!anyCodeMatches(given, codes), `should not match: ${given}`);
+  }
   assert.ok(codeMatches(" starpower ", "STARPOWER"));
   assert.ok(!codeMatches("STARPOWE", "STARPOWER"));
-  assert.ok(!codeMatches("", "STARPOWER"));
+  assert.equal(normalizeCode(" rd-Training 2O26 "), "RDTRAINING2026");
+});
+
+test("code list reads TOOLKIT_CODES, then TOOLKIT_CODE, then the defaults", () => {
+  const env = (o: Record<string, string>) => (k: string) => o[k];
+  assert.deepEqual(toolkitCodes(env({ TOOLKIT_CODES: "A1, B2 ,,C3" })), ["A1", "B2", "C3"]);
+  assert.deepEqual(toolkitCodes(env({ TOOLKIT_CODE: "ONLY" })), ["ONLY"]);
+  assert.deepEqual(toolkitCodes(env({ TOOLKIT_CODES: "A1", TOOLKIT_CODE: "ONLY" })), ["A1"]);
+  assert.deepEqual(toolkitCodes(env({ TOOLKIT_CODES: " , " })), DEFAULT_CODES);
+});
+
+test("adding a code does not change the signing secret", () => {
+  const env = (o: Record<string, string>) => (k: string) => o[k];
+  assert.equal(toolkitSecret(env({ TOOLKIT_CODES: "A1" })), toolkitSecret(env({ TOOLKIT_CODES: "A1,B2,C3" })));
+  assert.equal(toolkitSecret(env({ TOOLKIT_CODES: "A1,B2", TOOLKIT_SECRET: "a-long-random-secret-value" })), "a-long-random-secret-value");
+  assert.equal(toolkitSecret(() => undefined), "ltf-fallback:RDTraining2026");
 });
 
 test("access token round trip, tamper, expiry, wrong secret", async () => {
-  const secret = signingSecret("a-long-random-secret-value", "STARPOWER");
+  const secret = signingSecret("a-long-random-secret-value", "RDTraining2026");
   const token = await createToken(secret);
   assert.ok(await verifyToken(token, secret));
   assert.ok(!(await verifyToken(token, "a-different-secret-value")));
