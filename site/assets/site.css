@@ -46,7 +46,7 @@ p{margin:0}
 /* Header */
 .site-header{border-bottom:1px solid var(--line)}
 .site-header .wrap{display:flex;flex-wrap:wrap;align-items:center;justify-content:space-between;gap:12px 32px;padding-block:16px}
-.brand{display:flex;flex-direction:column;gap:5px;text-decoration:none;color:var(--ink)}
+.brand{display:flex;flex-direction:column;justify-content:center;min-height:44px;gap:5px;text-decoration:none;color:var(--ink)}
 .brand-name{font-family:var(--sans);font-size:15px;font-weight:600;letter-spacing:3.5px;text-transform:uppercase;line-height:1.2;color:var(--ink)}
 .brand-tag{font-size:12px;font-weight:500;letter-spacing:2.5px;text-transform:uppercase;line-height:1.3;color:var(--muted)}
 .nav{display:flex;flex-wrap:wrap;align-items:center;gap:0 22px;font-size:14px}
@@ -106,7 +106,8 @@ p{margin:0}
 .avatar{width:96px;height:96px;aspect-ratio:1;border-radius:50%;object-fit:cover;object-position:50% 8%;border:3px solid var(--pink)}
 .section-head{display:flex;flex-direction:column;gap:12px;max-width:720px;margin-bottom:32px}
 .split{display:flex;flex-wrap:wrap;align-items:center;gap:48px}
-.split-photo{flex:0 0 340px;width:340px;max-width:100%;height:auto;aspect-ratio:4/5;object-fit:cover;object-position:22% 50%}
+/* Shown uncropped (original 4:3) so the Just Closed sign is never cut mid-word */
+.split-photo{flex:0 0 440px;width:440px;max-width:100%;height:auto;aspect-ratio:4/3;object-fit:cover;object-position:50% 50%}
 .split-copy{flex:999 1 440px;min-width:0;display:flex;flex-direction:column;gap:16px}
 .split-copy p{max-width:38em}
 .facts{display:flex;flex-wrap:wrap;gap:8px 28px;padding:16px 0;border-top:1px solid var(--line);border-bottom:1px solid var(--line);font-size:14px;color:var(--muted)}
@@ -122,8 +123,9 @@ p{margin:0}
 /* Navy band */
 .band{background:var(--navy);color:var(--navy-text)}
 .band .wrap{display:flex;flex-wrap:wrap;align-items:stretch;padding-left:0;padding-right:0}
-.band-photo{flex:1 1 420px;min-width:0;min-height:360px;position:relative}
-.band-photo img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;object-position:50% 35%}
+.band-photo{flex:1 1 420px;min-width:0;aspect-ratio:2.1/1;align-self:center;position:relative}
+/* Wide, short frame anchored to the top: shows the three faces and stops above the Just Closed sign */
+.band-photo img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;object-position:50% 0}
 .band-copy{flex:1 1 420px;min-width:0;display:flex;flex-direction:column;justify-content:center;gap:18px;padding:64px max(24px, env(safe-area-inset-right, 0px)) 64px 56px}
 .band-copy h2{color:var(--paper)}
 .band-copy p{max-width:30em}
@@ -187,7 +189,7 @@ p{margin:0}
 .tk-tabs{position:sticky;top:0;z-index:5;background:rgba(248,245,239,.97);border-block:1px solid var(--line)}
 .tk-tabs .wrap{display:flex;align-items:center;gap:6px;overflow-x:auto;padding-block:12px;scrollbar-width:none}
 .tk-tabs .wrap::-webkit-scrollbar{display:none}
-.tk-tabs a{display:inline-flex;align-items:center;gap:8px;font-size:13.5px;text-decoration:none;white-space:nowrap;padding:9px 11px;border:1px solid var(--line);border-radius:999px;background:var(--white)}
+.tk-tabs a{display:inline-flex;align-items:center;gap:8px;font-size:13.5px;text-decoration:none;white-space:nowrap;padding:9px 11px;min-height:44px;border:1px solid var(--line);border-radius:999px;background:var(--white)}
 .tk-tabs a span{font-size:11px;font-weight:600;letter-spacing:1px;color:var(--ink)}
 .tk-tabs a:hover{border-color:var(--ink)}
 .tk-tabs a.is-current{background:var(--navy);border-color:var(--navy);color:var(--paper)}
@@ -300,7 +302,7 @@ button.cal-day[aria-pressed="true"]{background:var(--navy);color:var(--paper)}
 .site-footer .wrap{padding-block:36px;display:flex;flex-wrap:wrap;justify-content:space-between;gap:12px 24px;font-size:13px;line-height:1.7}
 .site-footer .fine{color:#B8B0A3}
 .site-footer p.fine{margin:0;flex-basis:100%}
-.site-footer a{color:var(--navy-text);text-underline-offset:3px;display:inline-block;padding-block:8px}
+.site-footer a{color:var(--navy-text);text-underline-offset:3px;display:inline-flex;align-items:center;min-height:44px;padding-block:8px}
 .site-footer a:hover{color:var(--pink)}
 
 /* toolkit additions */

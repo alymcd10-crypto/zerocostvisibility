@@ -156,7 +156,7 @@ await step('Phase 1: /setup forwards to the Book page and nothing links to it', 
   assert.equal(r.status(), 302);
   assert.equal(r.headers()['location'], '/book');
   await page.goto(BASE + '/book');
-  assert.equal(await page.locator('#c-topic').inputValue(), 'Booking a Visibility Session');
+  assert.equal(await page.locator('#c-topic').inputValue(), 'Booking a Zero-Cost Visibility Session');
 });
 
 await step('Book page: Cal.com fallback appears after 8 seconds when the calendar never loads', async () => {

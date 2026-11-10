@@ -184,7 +184,7 @@
       }, { rootMargin: '-120px 0px -60% 0px' });
       Object.keys(byId).forEach(function (id) { var s = document.getElementById(id); if (s) io.observe(s); });
     }
-    // Arriving from the slide 14 QR code (#step3) right after unlocking: land on the section
+    // Arriving from the slide 25 QR code (#step3) right after unlocking: land on the section
     if (location.hash) {
       var target = document.getElementById(decodeURIComponent(location.hash.slice(1)));
       var jump = function () { target.scrollIntoView({ block: 'start', behavior: 'instant' }); };
@@ -213,9 +213,9 @@
   // ---- Contact form ---------------------------------------------------------
   var contact = document.getElementById('contact-form');
   if (contact) {
-    // /book?topic=setup#contact (or #contact?topic=setup) preselects the Setup topic
+    // /book?topic=session#contact (or #contact?topic=session) preselects the topic
     var topic = params.get('topic') || new URLSearchParams(location.hash.split('?')[1] || '').get('topic');
-    var topics = { setup: 'The Visibility Setup', session: 'Booking a Visibility Session', speaking: 'Speaking at my event' };
+    var topics = { session: 'Booking a Zero-Cost Visibility Session', speaking: 'Speaking at my event' };
     if (topic && topics[topic]) contact.elements['topic'].value = topics[topic];
     if (/^#contact\?/.test(location.hash)) {
       var contactSection = document.getElementById('contact');

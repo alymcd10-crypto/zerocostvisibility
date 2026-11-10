@@ -14,6 +14,10 @@ Path: Netlify > the zerocostvisibility project > Project configuration > Environ
 - [ ] `BOOKING_PROVIDER` = `cal`
 - [ ] Redeploy after saving (Deploys > Trigger deploy), because variables only apply to new builds.
 
+### Cal.com naming
+- [ ] Rename the Cal.com event to "Zero-Cost Visibility Session" (it currently reads "1:1 Visibility Session").
+- [ ] Set the Cal.com host display name to "Liz Turnbaugh Federman" (no hyphen).
+
 ### Netlify Forms notifications
 Path: Netlify > Forms > Form notifications > Add notification > Email notification.
 

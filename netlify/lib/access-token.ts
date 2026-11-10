@@ -9,7 +9,7 @@ export const COOKIE_DAYS = 180;
 export const DEFAULT_CODES = ["RDTraining2026", "STARPOWER"];
 export const DEFAULT_CODE = DEFAULT_CODES[0];
 export const CODE_MISMATCH_MESSAGE =
-  "That code doesn't match. Check the spaces and the zero. It's on the last slide of the talk and in your binder.";
+  "That code doesn't match. Check the spaces and the zero. It's on the talk slides and in your binder.";
 
 const enc = new TextEncoder();
 
