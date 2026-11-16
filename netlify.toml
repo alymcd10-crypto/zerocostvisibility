@@ -8,63 +8,70 @@
 # They must stay above every other redirect.
 [[redirects]]
   from = "https://lizturnbaughfederman.com/*"
-  to = "https://zerocostvisibility.com/:splat"
+  to = "https://clientdrivenvisibility.com/:splat"
   status = 301
   force = true
 
 [[redirects]]
   from = "http://lizturnbaughfederman.com/*"
-  to = "https://zerocostvisibility.com/:splat"
+  to = "https://clientdrivenvisibility.com/:splat"
   status = 301
   force = true
 
 [[redirects]]
   from = "https://www.lizturnbaughfederman.com/*"
-  to = "https://zerocostvisibility.com/:splat"
+  to = "https://clientdrivenvisibility.com/:splat"
   status = 301
   force = true
 
 [[redirects]]
   from = "http://www.lizturnbaughfederman.com/*"
-  to = "https://zerocostvisibility.com/:splat"
+  to = "https://clientdrivenvisibility.com/:splat"
   status = 301
   force = true
 
 [[redirects]]
   from = "https://lizfederman.com/*"
-  to = "https://zerocostvisibility.com/:splat"
+  to = "https://clientdrivenvisibility.com/:splat"
   status = 301
   force = true
 
 [[redirects]]
   from = "http://lizfederman.com/*"
-  to = "https://zerocostvisibility.com/:splat"
+  to = "https://clientdrivenvisibility.com/:splat"
   status = 301
   force = true
 
 [[redirects]]
   from = "https://www.lizfederman.com/*"
-  to = "https://zerocostvisibility.com/:splat"
+  to = "https://clientdrivenvisibility.com/:splat"
   status = 301
   force = true
 
 [[redirects]]
   from = "http://www.lizfederman.com/*"
-  to = "https://zerocostvisibility.com/:splat"
+  to = "https://clientdrivenvisibility.com/:splat"
   status = 301
   force = true
 
 [[redirects]]
-  from = "https://www.zerocostvisibility.com/*"
-  to = "https://zerocostvisibility.com/:splat"
+  from = "https://www.clientdrivenvisibility.com/*"
+  to = "https://clientdrivenvisibility.com/:splat"
   status = 301
   force = true
 
 [[redirects]]
-  from = "http://www.zerocostvisibility.com/*"
-  to = "https://zerocostvisibility.com/:splat"
+  from = "http://www.clientdrivenvisibility.com/*"
+  to = "https://clientdrivenvisibility.com/:splat"
   status = 301
   force = true
+
+# Phase 1 shows only the 1:1 session. The Setup page is saved in phase2/ for later;
+# old links to /setup land on the Book page.
+[[redirects]]
+  from = "/setup"
+  to = "/book"
+  status = 302
 
 [[redirects]]
   from = "/toolkit"
@@ -75,6 +82,16 @@
 [[redirects]]
   from = "/starpower"
   to = "/toolkit/?utm_source=starpower&utm_medium=qr&utm_campaign=starpower2026&utm_content=closing-slide"
+  status = 302
+
+[[redirects]]
+  from = "/rd"
+  to = "/toolkit/?utm_source=rd-training&utm_medium=link&utm_campaign=rd2026&utm_content=short-link"
+  status = 302
+
+[[redirects]]
+  from = "/reset"
+  to = "/toolkit/?utm_source=rd-training&utm_medium=qr&utm_campaign=reset2026&utm_content=closing-slide"
   status = 302
 
 [[redirects]]

@@ -51,7 +51,7 @@ await step('wrong code shows an error and is tracked', async () => {
 });
 
 await step('right code (lower case) unlocks and lands on the review request (#step3)', async () => {
-  await page.fill('#gate-code', ' starpower ');
+  await page.fill('#gate-code', ' reset2026 ');
   await Promise.all([page.waitForURL(/#step3$/), page.waitForLoadState('load'), page.click('#gate-form button[type=submit]')]);
   await page.locator('#tpl-review').waitFor();
   await page.waitForTimeout(400);
@@ -68,17 +68,33 @@ await step('closing-slide QR (/starpower) opens the toolkit directly once unlock
   assert.ok(await page.locator('#tk-title').isVisible());
 });
 
+await step('REset closing-slide QR (/reset) and /rd open the toolkit with their UTM tags', async () => {
+  const r = await ctx.request.get(`${BASE}/reset`, { maxRedirects: 0 });
+  assert.equal(r.status(), 302);
+  assert.equal(r.headers().location, '/toolkit/?utm_source=rd-training&utm_medium=qr&utm_campaign=reset2026&utm_content=closing-slide');
+  await page.goto(`${BASE}/reset`);
+  assert.match(page.url(), /\/toolkit\/\?utm_source=rd-training&utm_medium=qr&utm_campaign=reset2026&utm_content=closing-slide$/);
+  assert.ok(await page.locator('#tk-title').isVisible());
+  await page.goto(`${BASE}/rd`);
+  assert.match(page.url(), /\/toolkit\/\?utm_source=rd-training.*utm_content=short-link$/);
+});
+
 // ---- 2. Every internal link resolves, and every #anchor exists on its target page
-const pages = ['/', '/setup', '/book', '/thanks', '/attendee/', '/toolkit/'];
+const pages = ['/', '/book', '/thanks', '/attendee/', '/toolkit/'];
 const linkProblems = [];
 let linkCount = 0;
 for (const p of pages) {
   await page.goto(BASE + p);
-  const hrefs = await page.$$eval('a[href]', (as) => as.map((a) => a.getAttribute('href')));
-  for (const href of new Set(hrefs)) {
+  const links = await page.$$eval('a[href]', (as) => as.map((a) => [a.getAttribute('href'), a.getAttribute('rel') || '']));
+  for (const [href, rel] of new Map(links)) {
     if (/^(tel|mailto):/.test(href)) continue;
     linkCount++;
     const url = new URL(href, BASE + p);
+    // The one outside link we mean to have: the RD Training Systems partner site. It must open safely.
+    if (url.host === 'rdtrainingsystems.com') {
+      if (!/noopener/.test(rel)) linkProblems.push(`${p}: ${href} needs rel="noopener"`);
+      continue;
+    }
     if (url.host !== new URL(BASE).host) { linkProblems.push(`${p}: external link ${href}`); continue; }
     const res = await ctx.request.get(url.toString());
     if (res.status() !== 200) { linkProblems.push(`${p}: ${href} → ${res.status()}`); continue; }
@@ -96,7 +112,7 @@ await step(`all ${linkCount} internal links and anchors resolve`, async () => as
 
 // ---- 3. Header navigation, clicked for real on every page
 await step('header links go where they say on every page', async () => {
-  const expected = [['Visibility Setup', /\/setup$/], ['Attendee toolkit', /\/toolkit\/$/], ['Contact', /\/book#contact$/], ['Book a session', /\/book$/]];
+  const expected = [['Attendee toolkit', /\/toolkit\/$/], ['Contact', /\/book#contact$/], ['Book a session', /\/book$/]];
   for (const p of pages) {
     for (const [text, re] of expected) {
       await page.goto(BASE + p);
@@ -112,8 +128,8 @@ await step('header links go where they say on every page', async () => {
 });
 
 await step('home page buttons go to the right place', async () => {
-  const buttons = [['See the Visibility Setup', /\/setup$/], ['Saw me speak? Open the toolkit', /\/toolkit\/$/], ['See what\'s included', /\/setup$/],
-    ['Book an audit', /\/book$/], ['Open the toolkit', /\/toolkit\/$/], ['Send a note', /\/book#contact$/]];
+  const buttons = [['Book a session', /\/book$/], ['Heard me speak? Open the toolkit', /\/toolkit\/$/],
+    ['Book a session', /\/book$/], ['Open the toolkit', /\/toolkit\/$/], ['Send a note', /\/book#contact$/]];
   for (const [text, re] of buttons) {
     await page.goto(BASE + '/');
     await page.getByRole('link', { name: text, exact: false }).first().click();
@@ -129,30 +145,12 @@ await step('home page buttons go to the right place', async () => {
 });
 
 // ---- 3b. The Setup page and the new offer
-await step('Setup page: buttons, topic preselect and pricing event', async () => {
-  await page.goto(BASE + '/setup');
-  assert.equal(await page.locator('h1').innerText(), 'Your system, built in two weeks.');
-  assert.equal(await page.locator('.included li').count(), 6);
-  assert.equal(await page.locator('.faq details').count(), 5);
-  assert.equal(await page.locator('.timeline li').count(), 4);
-  assert.ok(!(await events(page)).some(([n]) => n === 'view_setup_pricing'), 'pricing event waits until seen');
-  await page.locator('.price-block').scrollIntoViewIfNeeded();
-  await page.waitForTimeout(400);
-  await page.mouse.wheel(0, -400); await page.waitForTimeout(200);
-  await page.locator('.price-block').scrollIntoViewIfNeeded(); await page.waitForTimeout(400);
-  assert.equal((await events(page)).filter(([n]) => n === 'view_setup_pricing').length, 1, 'fires once');
-  await page.locator('.price-block a', { hasText: 'Start with a Visibility Audit' }).click();
-  await page.waitForLoadState('load');
-  assert.match(page.url(), /\/book$/);
-  await page.goto(BASE + '/setup');
-  await page.locator('.price-block a', { hasText: 'Ask about the Setup' }).click();
-  await page.waitForLoadState('load');
-  assert.match(page.url(), /\/book\?topic=setup#contact$/);
-  assert.equal(await page.locator('#c-topic').inputValue(), 'The Visibility Setup');
-  await page.goto(BASE + '/book#contact?topic=setup');
-  assert.equal(await page.locator('#c-topic').inputValue(), 'The Visibility Setup', 'hash form works too');
+await step('Phase 1: /setup forwards to the Book page and nothing links to it', async () => {
+  const r = await ctx.request.get(BASE + '/setup', { maxRedirects: 0 });
+  assert.equal(r.status(), 302);
+  assert.equal(r.headers()['location'], '/book');
   await page.goto(BASE + '/book');
-  assert.equal(await page.locator('#c-topic').inputValue(), 'Booking a Visibility Audit', 'default topic');
+  assert.equal(await page.locator('#c-topic').inputValue(), 'Booking a Visibility Session');
 });
 
 await step('Book page: Cal.com fallback appears after 8 seconds when the calendar never loads', async () => {
@@ -165,16 +163,16 @@ await step('Book page: Cal.com fallback appears after 8 seconds when the calenda
   await p.close();
 });
 
-await step('built pages carry the site address, sitemap lists /setup, robots keeps the gate private', async () => {
+await step('built pages carry the site address, the sitemap is right, robots keeps the gate private', async () => {
   const home = await (await ctx.request.get(BASE + '/')).text();
   assert.ok(!home.includes('{{SITE_URL}}'), 'placeholder filled');
   const { siteUrl } = JSON.parse(readFileSync(new URL('../site.config.json', import.meta.url), 'utf8'));
   assert.ok(home.includes(`<link rel="canonical" href="${siteUrl}/">`));
   const ld = JSON.parse(home.match(/<script type="application\/ld\+json">([\s\S]*?)<\/script>/)[1]);
   const offers = ld['@graph'].find((n) => n['@type'] === 'ProfessionalService').makesOffer.map((o) => [o.name, o.price]);
-  assert.deepEqual(offers, [['The Visibility Audit', '297'], ['Visibility Setup', '997']]);
+  assert.deepEqual(offers, [['The Client-Driven Visibility Session', '297']]);
   const sitemap = await (await ctx.request.get(BASE + '/sitemap.xml')).text();
-  assert.deepEqual([...sitemap.matchAll(/<loc>([^<]+)<\/loc>/g)].map((m) => m[1]), [`${siteUrl}/`, `${siteUrl}/book`, `${siteUrl}/setup`]);
+  assert.deepEqual([...sitemap.matchAll(/<loc>([^<]+)<\/loc>/g)].map((m) => m[1]), [`${siteUrl}/`, `${siteUrl}/book`]);
   const robots = await (await ctx.request.get(BASE + '/robots.txt')).text();
   for (const path of ['/toolkit/', '/attendee/', '/thanks']) assert.ok(robots.includes(`Disallow: ${path}`), path);
 });
@@ -191,14 +189,18 @@ await step('copy rules: no em dashes, banned words or "coach" in visible text; t
     for (const bad of ['—', 'elevate', 'unlock', 'leverage', 'game-changer', 'coach', '90-day', '90 day', '61–90', 'week by week']) {
       if (text.toLowerCase().includes(bad)) problems.push(`${p}: "${bad}"`);
     }
+    // The talk is now "Client-Driven Visibility"; the old name and old deck numbers must not come back.
+    for (const old of ['zero-cost', 'zero cost', '$45m', '115+', '121%', 'list-to-sale']) {
+      if (text.toLowerCase().includes(old)) problems.push(`${p}: old wording "${old}"`);
+    }
     // Say each thing once: these appear at most once per page
     const visible = await page.evaluate(() => document.body.innerText);
-    for (const once of ['$45M', '$379K', '100+', 'Google Meet', '$997', '$1,497']) {
+    for (const once of ['$46.5M', '$379K', '120+', 'Google Meet', '$997', '$1,497']) {
       const n = visible.split(once).length - 1;
       if (n > 1) problems.push(`${p}: "${once}" appears ${n} times`);
     }
     if (p !== '/toolkit/') {
-      for (const secret of ['I ask for it', 'Hand them the post', 'ninety-second ask', 'screenshot of the post']) {
+      for (const secret of ['I ask for it', 'Hand them the post', 'ninety-second ask', 'screenshot of the post', 'They post about', 'They recommend', 'They review', 'Facebook group', 'client post']) {
         if (text.includes(secret)) problems.push(`${p}: gated text "${secret}" on a public page`);
       }
     }
@@ -241,19 +243,20 @@ await step('stylesheet: original cream, navy and gold look with the pink accents
 // ---- 4. Toolkit tabs, copy buttons, print, CTA
 await step('each toolkit tab scrolls to its section and highlights', async () => {
   await page.goto(BASE + '/toolkit/');
-  for (const id of ['step1', 'step2', 'step3', 'ai', 'calendar']) {
+  for (const id of ['step1', 'step2', 'step3', 'ai', 'calendar', 'score']) {
     await page.locator(`.tk-tabs a[href="#${id}"]`).click();
-    await page.waitForTimeout(700);
+    // Smooth scroll covers longer distances now the review section holds the worksheets: wait for it to settle.
+    await page.waitForFunction((sel) => { const t = document.querySelector(sel).getBoundingClientRect().top; return t > -5 && t < 200; }, '#' + id, { timeout: 3000 }).catch(() => {});
     const top = await page.locator('#' + id).evaluate((el) => el.getBoundingClientRect().top);
     assert.ok(top > -5 && top < 200, `#${id} top ${top}`);
     assert.equal(await page.locator(`.tk-tabs a[href="#${id}"]`).getAttribute('aria-current'), 'true', `${id} tab highlighted`);
   }
 });
 
-await step('all 13 copy buttons copy the exact template text', async () => {
+await step('all 17 copy buttons copy the exact template text', async () => {
   await page.goto(BASE + '/toolkit/');
   const ids = await page.$$eval('[data-copy]', (bs) => bs.map((b) => b.dataset.copy));
-  assert.equal(ids.length, 13);
+  assert.equal(ids.length, 17);
   for (const id of ids) {
     const btn = page.locator(`[data-copy="${id}"]`);
     await btn.click();
@@ -263,7 +266,7 @@ await step('all 13 copy buttons copy the exact template text', async () => {
     assert.equal(clip, text, `${id} clipboard`);
   }
   const copies = (await events(page)).filter(([n]) => n === 'copy_template');
-  assert.equal(copies.length, 13);
+  assert.equal(copies.length, 17);
   assert.ok(copies.every(([, d]) => d.template_name && d.section), 'events carry template name and section');
 });
 

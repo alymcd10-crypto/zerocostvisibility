@@ -1,4 +1,4 @@
-# zerocostvisibility.com: setup and launch checklist
+# clientdrivenvisibility.com: setup and launch checklist
 
 The pages live in `site/` (plain HTML). On every deploy, `scripts/build.mjs` copies them to `dist/` and fills in the site address (see **Site address** below). Server code lives in `netlify/`:
 - `functions/bookings.ts`: the built-in booking calendar.
@@ -9,37 +9,38 @@ Data lives in Netlify Database. Its tables are created and updated automatically
 
 **Deploys come from GitHub.** Every push to `main` deploys automatically. Don't drag a folder into Netlify: a manual upload doesn't include the server code or run the database migrations.
 
+## Phase 1 and Phase 2
+This branch is **Phase 1**: the site offers only the 1:1 session with Liz. The Visibility Setup page is saved in `phase2/setup.html` (not published), and `/setup` forwards to `/book`. The full version with the Setup is what's on `main` today; to bring it back, restore `phase2/setup.html` to `site/`, re-add the Setup card, menu link, contact topic, credit line and JSON-LD offer, and remove the `/setup` redirect in `netlify.toml`.
+
 ## Pages
 | URL | What it is |
 |---|---|
 | `/` | Home |
-| `/setup` | The Visibility Setup: the done-for-you offer, $997 founding price |
 | `/book` | Book the Visibility Audit (Cal.com calendar) and the contact form. `/book?topic=setup#contact` preselects the Setup in the contact form |
-| `/toolkit/` | Starpower attendee toolkit. Locked; visitors without access see the code page at the same address |
+| `/toolkit/` | Attendee toolkit for RD Training Systems sessions and other talks. Locked; visitors without access see the code page at the same address |
 | `/attendee/` | The code page itself |
 | `/thanks.html` | Fallback thank-you page for the contact form |
-| `/starpower` | Short link for the QR code on the closing slide |
+| `/starpower` | Short link for the QR code printed on the closing slide (keep: the QR is already in the deck) |
+| `/rd` | Short link to say out loud or print in RD Training Systems materials |
+| `/reset` | Short link for the QR code on the closing slide at The REset Executive Training (tagged `utm_source=rd-training`, `utm_campaign=reset2026`) |
 | `/reviews` | Short link for the QR code on slide 14 (opens the review request) |
 
 ## One-time setup in Netlify (about 20 minutes)
 1. **Connect the repo.** Project configuration > Build & deploy > Link repository > GitHub > `zerocostvisibility`. Set branch `main`. Leave the build settings alone: `netlify.toml` sets the build command (`node scripts/build.mjs`) and publish directory (`dist`).
 2. **Attendee code.** Project configuration > Environment variables > Add:
-   - `TOOLKIT_CODE` = `STARPOWER` (or whatever is on the closing slide; not case sensitive)
+   - `TOOLKIT_CODE` = a comma-separated list of the codes that open the toolkit, for example `RESET2026,RDTraining2026,STARPOWER`. Any one of them works. Codes are not case sensitive and spaces around the commas are ignored. A single code (just `STARPOWER`) also works. The codes printed in Liz's decks (`RESET2026`, `RDTraining2026`, `STARPOWER`) always work as well, whatever this is set to; they are listed in `EVENT_CODES` in `netlify/lib/access-token.ts`. Use this variable to add a new event's code.
    - `TOOLKIT_SECRET` = any long random text, 32+ characters. A password manager's generator works. This signs the "already entered the code" cookie.
 
-   Changing either value signs everyone out, so they'd need the code again.
+   Changing either value signs everyone out, so they'd need a code again. That includes adding or removing a code from the list when `TOOLKIT_SECRET` isn't set.
 3. **Form emails.** Forms > Form notifications > Email notification for `booking`, `contact` and `toolkit-access`, sent to the address that should receive them.
 4. **Domain (later).** See **Site address and domains** below.
 
 ## Site address and domains
-The site's address is set in one place: `siteUrl` in `site.config.json`, currently `https://zerocostvisibility.netlify.app`. The build fills it into every canonical link, Open Graph tag, the JSON-LD business details, `sitemap.xml` and `robots.txt` (written as `{{SITE_URL}}` in the files under `site/`).
+The site's address is set in one place: `siteUrl` in `site.config.json`, currently `https://clientdrivenvisibility.com`. The build fills it into every canonical link, Open Graph tag, the JSON-LD business details, `sitemap.xml` and `robots.txt` (written as `{{SITE_URL}}` in the files under `site/`).
 
-**Switching to zerocostvisibility.com:**
-1. Netlify > Domain management > add `zerocostvisibility.com` and make it the **primary domain**.
-2. Change `siteUrl` in `site.config.json` to `https://zerocostvisibility.com` (one line) and push.
-3. Add the new domain to the GA4 data stream and to Search Console, and resubmit `sitemap.xml`.
+**The domain:** `clientdrivenvisibility.com` is registered at Netlify and set as the primary domain. The old `zerocostvisibility.netlify.app` address keeps working and forwards to it. Do not rename the Netlify project: that would change the netlify.app address that older QR codes use.
 
-**Extra domains:** `netlify.toml` already forwards `lizturnbaughfederman.com`, `lizfederman.com` (with and without `www`) and `www.zerocostvisibility.com` to `https://zerocostvisibility.com` with a 301. These rules do nothing until each domain is added under Domain management > **Add a domain alias**, so buy and attach them whenever you're ready.
+**Extra domains:** `netlify.toml` already forwards `lizturnbaughfederman.com`, `lizfederman.com` (with and without `www`) and `www.clientdrivenvisibility.com` to `https://zerocostvisibility.com` with a 301. These rules do nothing until each domain is added under Domain management > **Add a domain alias**, so buy and attach them whenever you're ready.
 
 ## Booking: Cal.com with Google Calendar and Google Meet (recommended)
 `site/assets/config.js` is already set to Cal.com. Until its link is pasted in, the Book page falls back to the built-in calendar.
@@ -59,7 +60,7 @@ The site's address is set in one place: `siteUrl` in `site.config.json`, current
 - **Calendly** (`bookingProvider: 'calendly'`, `bookingUrl: 'https://calendly.com/…'`): taking payment at booking needs Calendly Standard ($10/mo).
 
 ## Google Analytics 4 and Search Console
-1. **GA4:** analytics.google.com > Admin > Create property > Web data stream for zerocostvisibility.com. Copy the measurement ID (`G-…`) into `ga4Id` in `site/assets/config.js`. Tracking only runs on the live site.
+1. **GA4:** analytics.google.com > Admin > Create property > Web data stream for clientdrivenvisibility.com. Copy the measurement ID (`G-…`) into `ga4Id` in `site/assets/config.js`. Tracking only runs on the live site.
 2. **Key events:** in GA4 > Admin > Data display > Events, turn on **Mark as key event** for `generate_lead` (booking or contact form sent; contact forms carry the `topic`, so Setup inquiries show up as `topic = The Visibility Setup`), `toolkit_unlock` (attendee entered the code) and `booking_time_selected` (a visitor picked a time). Note: Cal.com's embed doesn't report a time being picked, so with Cal.com `booking_time_selected` stays at zero, and finished Cal.com bookings arrive as `generate_lead` with `method = cal`.
 3. **Events the site sends:**
 
