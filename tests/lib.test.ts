@@ -97,6 +97,15 @@ test("RESET2026 opens at midnight Eastern on December 15, 2026", () => {
   assert.deepEqual(checkCode("RESET2026", "STARPOWER", Date.parse("2027-03-01T12:00:00Z")), { ok: true });
 });
 
+test("an event code stays closed before its date even if TOOLKIT_CODE lists it", () => {
+  const before = Date.parse("2026-12-14T23:59:00-05:00");
+  const after = Date.parse("2026-12-15T00:00:00-05:00");
+  const env = "RESET2026,RDTraining2026,STARPOWER";
+  assert.deepEqual(checkCode("RESET2026", env, before), { ok: false, opensLabel: "December 15" });
+  assert.deepEqual(checkCode("RESET2026", env, after), { ok: true });
+  assert.deepEqual(checkCode("STARPOWER", env, before), { ok: true });
+});
+
 test("TOOLKIT_CODE codes work at any time, for testing", () => {
   const early = Date.parse("2026-11-20T12:00:00Z");
   assert.deepEqual(checkCode("starpower", "STARPOWER", early), { ok: true });

@@ -15,16 +15,16 @@ export const EVENT_CODES: { code: string; opens: string; label: string }[] = [
 
 export type CodeResult = { ok: true } | { ok: false; opensLabel?: string };
 
-// Checks a submitted code against TOOLKIT_CODE (always valid) and the event codes (valid from
-// their opening time). A correct event code used too early says when it opens.
+// Checks a submitted code against the event codes (valid from their opening time) and
+// TOOLKIT_CODE (always valid). The opening time wins: an event code stays closed until then
+// even if it is also listed in TOOLKIT_CODE. Used too early, it says when it opens.
 export function checkCode(given: string, envCode: string, now = Date.now()): CodeResult {
-  if (codeMatches(given, envCode)) return { ok: true };
   for (const e of EVENT_CODES) {
     if (!codeMatches(given, e.code)) continue;
     if (now >= Date.parse(e.opens)) return { ok: true };
     return { ok: false, opensLabel: e.label };
   }
-  return { ok: false };
+  return codeMatches(given, envCode) ? { ok: true } : { ok: false };
 }
 
 const enc = new TextEncoder();
