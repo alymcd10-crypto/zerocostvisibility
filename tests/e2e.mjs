@@ -28,7 +28,7 @@ await ctx.grantPermissions(['clipboard-read', 'clipboard-write'], { origin: BASE
 const page = await ctx.newPage();
 const consoleErrors = [];
 page.on('pageerror', (e) => consoleErrors.push(`${page.url()}: ${e.message}`));
-page.on('console', (m) => { if (m.type() === 'error' && !/fonts\.g/.test(m.text()) && !/status of 401/.test(m.text())) consoleErrors.push(`${page.url()}: ${m.text()}`); });
+page.on('console', (m) => { if (m.type() === 'error' && !/fonts\.g/.test(m.text()) && !/status of 40[13]/.test(m.text())) consoleErrors.push(`${page.url()}: ${m.text()}`); });
 
 // ---- 1. The toolkit is locked: QR link for slide 14 shows the code page at the same URL
 await step('slide 14 QR (/reviews) lands on the code page, toolkit HTML not sent', async () => {
@@ -50,8 +50,17 @@ await step('wrong code shows an error and is tracked', async () => {
   assert.ok((await events(page)).some(([n]) => n === 'toolkit_code_fail'));
 });
 
+await step('the event code before its opening date says when the toolkit opens', async () => {
+  // Today is before 15 December 2026 in this test run; after that date this step is skipped.
+  if (Date.now() >= Date.parse('2026-12-15T00:00:00-05:00')) return;
+  await page.fill('#gate-code', 'RESET2026');
+  await page.click('#gate-form button[type=submit]');
+  await page.locator('#gate-error').waitFor({ state: 'visible' });
+  assert.match(await page.locator('#gate-error').innerText(), /opens on December 15/);
+});
+
 await step('right code (lower case) unlocks and lands on the review request (#step3)', async () => {
-  await page.fill('#gate-code', ' reset2026 ');
+  await page.fill('#gate-code', ' starpower ');
   await Promise.all([page.waitForURL(/#step3$/), page.waitForLoadState('load'), page.click('#gate-form button[type=submit]')]);
   await page.locator('#tpl-review').waitFor();
   await page.waitForTimeout(400);

@@ -1,6 +1,6 @@
 import { test } from "node:test";
 import assert from "node:assert/strict";
-import { acceptedCodes, codeMatches, createToken, parseCodes, readCookie, signingSecret, verifyToken } from "../netlify/lib/access-token.ts";
+import { checkCode, codeMatches, createToken, parseCodes, readCookie, signingSecret, verifyToken } from "../netlify/lib/access-token.ts";
 import { BOOKING_RULES, bookableRange, slotError, todayIn } from "../netlify/lib/booking-rules.ts";
 
 test("attendee code is case and space insensitive", () => {
@@ -89,10 +89,30 @@ test("slot rules", () => {
   assert.match(slotError({ ...r, blockedDates: ["2026-11-03"] }, "2026-11-03", "9:00 AM", now)!, /isn't taking sessions/);
 });
 
-test("deck codes unlock even when TOOLKIT_CODE is still the old single code", () => {
-  assert.ok(codeMatches("RESET2026", acceptedCodes("STARPOWER")));
-  assert.ok(codeMatches(" reset2026 ", acceptedCodes("STARPOWER")));
-  assert.ok(codeMatches("RDTraining2026", acceptedCodes("STARPOWER")));
-  assert.ok(codeMatches("NEWCODE", acceptedCodes("NEWCODE")));
-  assert.ok(!codeMatches("RESET2025", acceptedCodes("STARPOWER")));
+test("RESET2026 opens at midnight Eastern on December 15, 2026", () => {
+  const before = Date.parse("2026-12-14T23:59:00-05:00");
+  const after = Date.parse("2026-12-15T00:00:00-05:00");
+  assert.deepEqual(checkCode("RESET2026", "STARPOWER", before), { ok: false, opensLabel: "December 15" });
+  assert.deepEqual(checkCode(" reset2026 ", "STARPOWER", after), { ok: true });
+  assert.deepEqual(checkCode("RESET2026", "STARPOWER", Date.parse("2027-03-01T12:00:00Z")), { ok: true });
+});
+
+test("an event code stays closed before its date even if TOOLKIT_CODE lists it", () => {
+  const before = Date.parse("2026-12-14T23:59:00-05:00");
+  const after = Date.parse("2026-12-15T00:00:00-05:00");
+  const env = "RESET2026,RDTraining2026,STARPOWER";
+  assert.deepEqual(checkCode("RESET2026", env, before), { ok: false, opensLabel: "December 15" });
+  assert.deepEqual(checkCode("RESET2026", env, after), { ok: true });
+  assert.deepEqual(checkCode("STARPOWER", env, before), { ok: true });
+});
+
+test("TOOLKIT_CODE codes work at any time, for testing", () => {
+  const early = Date.parse("2026-11-20T12:00:00Z");
+  assert.deepEqual(checkCode("starpower", "STARPOWER", early), { ok: true });
+  assert.deepEqual(checkCode("TESTCODE", "STARPOWER,TESTCODE", early), { ok: true });
+});
+
+test("wrong codes are refused without a date hint", () => {
+  assert.deepEqual(checkCode("RESET2025", "STARPOWER"), { ok: false });
+  assert.deepEqual(checkCode("", "STARPOWER"), { ok: false });
 });
