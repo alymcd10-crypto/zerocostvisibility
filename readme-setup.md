@@ -28,7 +28,7 @@ This branch is **Phase 1**: the site offers only the 1:1 session with Liz. The V
 ## One-time setup in Netlify (about 20 minutes)
 1. **Connect the repo.** Project configuration > Build & deploy > Link repository > GitHub > `zerocostvisibility`. Set branch `main`. Leave the build settings alone: `netlify.toml` sets the build command (`node scripts/build.mjs`) and publish directory (`dist`).
 2. **Attendee code.** Project configuration > Environment variables > Add:
-   - `TOOLKIT_CODE` = a comma-separated list of the codes that open the toolkit, for example `RESET2026,RDTraining2026,STARPOWER`. Any one of them works. Codes are not case sensitive and spaces around the commas are ignored. A single code (just `STARPOWER`) also works.
+   - `TOOLKIT_CODE` = a comma-separated list of the codes that open the toolkit, for example `RESET2026,RDTraining2026,STARPOWER`. Any one of them works. Codes are not case sensitive and spaces around the commas are ignored. A single code (just `STARPOWER`) also works. The codes printed in Liz's decks (`RESET2026`, `RDTraining2026`, `STARPOWER`) always work as well, whatever this is set to; they are listed in `EVENT_CODES` in `netlify/lib/access-token.ts`. Use this variable to add a new event's code.
    - `TOOLKIT_SECRET` = any long random text, 32+ characters. A password manager's generator works. This signs the "already entered the code" cookie.
 
    Changing either value signs everyone out, so they'd need a code again. That includes adding or removing a code from the list when `TOOLKIT_SECRET` isn't set.

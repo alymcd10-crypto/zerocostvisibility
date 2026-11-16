@@ -6,6 +6,14 @@
 export const COOKIE_NAME = "ltf_toolkit";
 export const COOKIE_DAYS = 180;
 export const DEFAULT_CODE = "STARPOWER";
+// Codes printed in Liz's decks. They always unlock, whatever TOOLKIT_CODE is set to, so an
+// attendee typing the code from the slide is never refused because a Netlify setting lags.
+export const EVENT_CODES = "RESET2026,RDTraining2026,STARPOWER";
+
+// Every code that unlocks: the TOOLKIT_CODE list plus the deck codes.
+export function acceptedCodes(envCode: string): string {
+  return `${envCode},${EVENT_CODES}`;
+}
 
 const enc = new TextEncoder();
 

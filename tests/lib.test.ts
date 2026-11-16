@@ -1,6 +1,6 @@
 import { test } from "node:test";
 import assert from "node:assert/strict";
-import { codeMatches, createToken, parseCodes, readCookie, signingSecret, verifyToken } from "../netlify/lib/access-token.ts";
+import { acceptedCodes, codeMatches, createToken, parseCodes, readCookie, signingSecret, verifyToken } from "../netlify/lib/access-token.ts";
 import { BOOKING_RULES, bookableRange, slotError, todayIn } from "../netlify/lib/booking-rules.ts";
 
 test("attendee code is case and space insensitive", () => {
@@ -87,4 +87,12 @@ test("slot rules", () => {
   assert.match(slotError(r, "2026-02-31", "9:00 AM", now)!, /Please pick a day/);
   assert.match(slotError(r, "9999-12-31", "9:00 AM", now)!, /isn't open/);
   assert.match(slotError({ ...r, blockedDates: ["2026-11-03"] }, "2026-11-03", "9:00 AM", now)!, /isn't taking sessions/);
+});
+
+test("deck codes unlock even when TOOLKIT_CODE is still the old single code", () => {
+  assert.ok(codeMatches("RESET2026", acceptedCodes("STARPOWER")));
+  assert.ok(codeMatches(" reset2026 ", acceptedCodes("STARPOWER")));
+  assert.ok(codeMatches("RDTraining2026", acceptedCodes("STARPOWER")));
+  assert.ok(codeMatches("NEWCODE", acceptedCodes("NEWCODE")));
+  assert.ok(!codeMatches("RESET2025", acceptedCodes("STARPOWER")));
 });

@@ -51,7 +51,7 @@ await step('wrong code shows an error and is tracked', async () => {
 });
 
 await step('right code (lower case) unlocks and lands on the review request (#step3)', async () => {
-  await page.fill('#gate-code', ' starpower ');
+  await page.fill('#gate-code', ' reset2026 ');
   await Promise.all([page.waitForURL(/#step3$/), page.waitForLoadState('load'), page.click('#gate-form button[type=submit]')]);
   await page.locator('#tpl-review').waitFor();
   await page.waitForTimeout(400);
@@ -243,19 +243,20 @@ await step('stylesheet: original cream, navy and gold look with the pink accents
 // ---- 4. Toolkit tabs, copy buttons, print, CTA
 await step('each toolkit tab scrolls to its section and highlights', async () => {
   await page.goto(BASE + '/toolkit/');
-  for (const id of ['step1', 'step2', 'step3', 'ai', 'calendar']) {
+  for (const id of ['step1', 'step2', 'step3', 'ai', 'calendar', 'score']) {
     await page.locator(`.tk-tabs a[href="#${id}"]`).click();
-    await page.waitForTimeout(700);
+    // Smooth scroll covers longer distances now the review section holds the worksheets: wait for it to settle.
+    await page.waitForFunction((sel) => { const t = document.querySelector(sel).getBoundingClientRect().top; return t > -5 && t < 200; }, '#' + id, { timeout: 3000 }).catch(() => {});
     const top = await page.locator('#' + id).evaluate((el) => el.getBoundingClientRect().top);
     assert.ok(top > -5 && top < 200, `#${id} top ${top}`);
     assert.equal(await page.locator(`.tk-tabs a[href="#${id}"]`).getAttribute('aria-current'), 'true', `${id} tab highlighted`);
   }
 });
 
-await step('all 13 copy buttons copy the exact template text', async () => {
+await step('all 17 copy buttons copy the exact template text', async () => {
   await page.goto(BASE + '/toolkit/');
   const ids = await page.$$eval('[data-copy]', (bs) => bs.map((b) => b.dataset.copy));
-  assert.equal(ids.length, 13);
+  assert.equal(ids.length, 17);
   for (const id of ids) {
     const btn = page.locator(`[data-copy="${id}"]`);
     await btn.click();
@@ -265,7 +266,7 @@ await step('all 13 copy buttons copy the exact template text', async () => {
     assert.equal(clip, text, `${id} clipboard`);
   }
   const copies = (await events(page)).filter(([n]) => n === 'copy_template');
-  assert.equal(copies.length, 13);
+  assert.equal(copies.length, 17);
   assert.ok(copies.every(([, d]) => d.template_name && d.section), 'events carry template name and section');
 });
 
