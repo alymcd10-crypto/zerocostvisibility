@@ -6,13 +6,25 @@
 export const COOKIE_NAME = "ltf_toolkit";
 export const COOKIE_DAYS = 180;
 export const DEFAULT_CODE = "STARPOWER";
-// Codes printed in Liz's decks. They always unlock, whatever TOOLKIT_CODE is set to, so an
-// attendee typing the code from the slide is never refused because a Netlify setting lags.
-export const EVENT_CODES = "RESET2026,RDTraining2026,STARPOWER";
+// Codes printed in Liz's decks, each with the moment it starts working. They work whatever
+// TOOLKIT_CODE is set to, so the code on the slide never depends on a Netlify setting.
+// Codes in TOOLKIT_CODE work at any time: use one there to test before an event opens.
+export const EVENT_CODES: { code: string; opens: string; label: string }[] = [
+  { code: "RESET2026", opens: "2026-12-15T00:00:00-05:00", label: "December 15" },
+];
 
-// Every code that unlocks: the TOOLKIT_CODE list plus the deck codes.
-export function acceptedCodes(envCode: string): string {
-  return `${envCode},${EVENT_CODES}`;
+export type CodeResult = { ok: true } | { ok: false; opensLabel?: string };
+
+// Checks a submitted code against TOOLKIT_CODE (always valid) and the event codes (valid from
+// their opening time). A correct event code used too early says when it opens.
+export function checkCode(given: string, envCode: string, now = Date.now()): CodeResult {
+  if (codeMatches(given, envCode)) return { ok: true };
+  for (const e of EVENT_CODES) {
+    if (!codeMatches(given, e.code)) continue;
+    if (now >= Date.parse(e.opens)) return { ok: true };
+    return { ok: false, opensLabel: e.label };
+  }
+  return { ok: false };
 }
 
 const enc = new TextEncoder();

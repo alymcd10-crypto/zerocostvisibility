@@ -1,7 +1,7 @@
 import type { Config } from "@netlify/functions";
 import { db } from "../../db/index.js";
 import { toolkitAccess } from "../../db/schema.js";
-import { DEFAULT_CODE, acceptedCodes, codeMatches, cookieHeader, createToken, signingSecret } from "../lib/access-token.js";
+import { DEFAULT_CODE, checkCode, cookieHeader, createToken, signingSecret } from "../lib/access-token.js";
 
 const EMAIL = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
@@ -28,7 +28,11 @@ export default async (req: Request) => {
   // Any entry in the list unlocks. The signing secret below uses the full string, so a single
   // code behaves exactly as before and the edge gate (which reads the same string) agrees.
   const code = Netlify.env.get("TOOLKIT_CODE") || DEFAULT_CODE;
-  if (!codeMatches(s("code"), acceptedCodes(code))) {
+  const result = checkCode(s("code"), code);
+  if (!result.ok && result.opensLabel) {
+    return json({ error: `That's the right code. The toolkit opens on ${result.opensLabel}.` }, 403);
+  }
+  if (!result.ok) {
     return json({ error: "That code doesn't match. It's on Liz's closing slide." }, 401);
   }
 

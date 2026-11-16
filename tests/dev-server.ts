@@ -5,7 +5,7 @@ import { createServer } from "node:http";
 import { readFile, stat } from "node:fs/promises";
 import { extname, join, normalize } from "node:path";
 import {
-  DEFAULT_CODE, acceptedCodes, codeMatches, cookieHeader, createToken, readCookie, signingSecret, verifyToken,
+  DEFAULT_CODE, checkCode, codeMatches, cookieHeader, createToken, readCookie, signingSecret, verifyToken,
 } from "../netlify/lib/access-token.ts";
 import { BOOKING_RULES, bookableRange, slotError } from "../netlify/lib/booking-rules.ts";
 
@@ -48,7 +48,9 @@ createServer(async (req, res) => {
   if (url.pathname === "/api/toolkit-access" && req.method === "POST") {
     const b = JSON.parse(body || "{}");
     if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(b.email ?? "")) return send(400, { error: "Please enter a valid email." });
-    if (!codeMatches(b.code ?? "", acceptedCodes(DEFAULT_CODE))) return send(401, { error: "That code doesn't match. It's on Liz's closing slide." });
+    const result = checkCode(b.code ?? "", DEFAULT_CODE);
+    if (!result.ok && result.opensLabel) return send(403, { error: `That's the right code. The toolkit opens on ${result.opensLabel}.` });
+    if (!result.ok) return send(401, { error: "That code doesn't match. It's on Liz's closing slide." });
     access.push({ email: b.email, source: b.source ?? "" });
     // Plain http in the test, so the Secure flag is dropped here only.
     return send(200, { ok: true }, { "Set-Cookie": cookieHeader(await createToken(SECRET)).replace("; Secure", "") });
