@@ -68,6 +68,17 @@ await step('closing-slide QR (/starpower) opens the toolkit directly once unlock
   assert.ok(await page.locator('#tk-title').isVisible());
 });
 
+await step('REset closing-slide QR (/reset) and /rd open the toolkit with their UTM tags', async () => {
+  const r = await ctx.request.get(`${BASE}/reset`, { maxRedirects: 0 });
+  assert.equal(r.status(), 302);
+  assert.equal(r.headers().location, '/toolkit/?utm_source=rd-training&utm_medium=qr&utm_campaign=reset2026&utm_content=closing-slide');
+  await page.goto(`${BASE}/reset`);
+  assert.match(page.url(), /\/toolkit\/\?utm_source=rd-training&utm_medium=qr&utm_campaign=reset2026&utm_content=closing-slide$/);
+  assert.ok(await page.locator('#tk-title').isVisible());
+  await page.goto(`${BASE}/rd`);
+  assert.match(page.url(), /\/toolkit\/\?utm_source=rd-training.*utm_content=short-link$/);
+});
+
 // ---- 2. Every internal link resolves, and every #anchor exists on its target page
 const pages = ['/', '/book', '/thanks', '/attendee/', '/toolkit/'];
 const linkProblems = [];
@@ -159,7 +170,7 @@ await step('built pages carry the site address, the sitemap is right, robots kee
   assert.ok(home.includes(`<link rel="canonical" href="${siteUrl}/">`));
   const ld = JSON.parse(home.match(/<script type="application\/ld\+json">([\s\S]*?)<\/script>/)[1]);
   const offers = ld['@graph'].find((n) => n['@type'] === 'ProfessionalService').makesOffer.map((o) => [o.name, o.price]);
-  assert.deepEqual(offers, [['The Zero-Cost Visibility Session', '297']]);
+  assert.deepEqual(offers, [['The Client-Driven Visibility Session', '297']]);
   const sitemap = await (await ctx.request.get(BASE + '/sitemap.xml')).text();
   assert.deepEqual([...sitemap.matchAll(/<loc>([^<]+)<\/loc>/g)].map((m) => m[1]), [`${siteUrl}/`, `${siteUrl}/book`]);
   const robots = await (await ctx.request.get(BASE + '/robots.txt')).text();
@@ -178,9 +189,13 @@ await step('copy rules: no em dashes, banned words or "coach" in visible text; t
     for (const bad of ['—', 'elevate', 'unlock', 'leverage', 'game-changer', 'coach', '90-day', '90 day', '61–90', 'week by week']) {
       if (text.toLowerCase().includes(bad)) problems.push(`${p}: "${bad}"`);
     }
+    // The talk is now "Client-Driven Visibility"; the old name and old deck numbers must not come back.
+    for (const old of ['zero-cost', 'zero cost', '$45m', '115+', '121%', 'list-to-sale']) {
+      if (text.toLowerCase().includes(old)) problems.push(`${p}: old wording "${old}"`);
+    }
     // Say each thing once: these appear at most once per page
     const visible = await page.evaluate(() => document.body.innerText);
-    for (const once of ['$45M', '$379K', '115+', 'Google Meet', '$997', '$1,497']) {
+    for (const once of ['$46.5M', '$379K', '120+', 'Google Meet', '$997', '$1,497']) {
       const n = visible.split(once).length - 1;
       if (n > 1) problems.push(`${p}: "${once}" appears ${n} times`);
     }

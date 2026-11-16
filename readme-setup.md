@@ -22,15 +22,16 @@ This branch is **Phase 1**: the site offers only the 1:1 session with Liz. The V
 | `/thanks.html` | Fallback thank-you page for the contact form |
 | `/starpower` | Short link for the QR code printed on the closing slide (keep: the QR is already in the deck) |
 | `/rd` | Short link to say out loud or print in RD Training Systems materials |
+| `/reset` | Short link for the QR code on the closing slide at The REset Executive Training (tagged `utm_source=rd-training`, `utm_campaign=reset2026`) |
 | `/reviews` | Short link for the QR code on slide 14 (opens the review request) |
 
 ## One-time setup in Netlify (about 20 minutes)
 1. **Connect the repo.** Project configuration > Build & deploy > Link repository > GitHub > `zerocostvisibility`. Set branch `main`. Leave the build settings alone: `netlify.toml` sets the build command (`node scripts/build.mjs`) and publish directory (`dist`).
 2. **Attendee code.** Project configuration > Environment variables > Add:
-   - `TOOLKIT_CODE` = `STARPOWER` (or whatever is on the closing slide; not case sensitive)
+   - `TOOLKIT_CODE` = a comma-separated list of the codes that open the toolkit, for example `RESET2026,RDTraining2026,STARPOWER`. Any one of them works. Codes are not case sensitive and spaces around the commas are ignored. A single code (just `STARPOWER`) also works.
    - `TOOLKIT_SECRET` = any long random text, 32+ characters. A password manager's generator works. This signs the "already entered the code" cookie.
 
-   Changing either value signs everyone out, so they'd need the code again.
+   Changing either value signs everyone out, so they'd need a code again. That includes adding or removing a code from the list when `TOOLKIT_SECRET` isn't set.
 3. **Form emails.** Forms > Form notifications > Email notification for `booking`, `contact` and `toolkit-access`, sent to the address that should receive them.
 4. **Domain (later).** See **Site address and domains** below.
 

@@ -1,12 +1,47 @@
 import { test } from "node:test";
 import assert from "node:assert/strict";
-import { codeMatches, createToken, readCookie, signingSecret, verifyToken } from "../netlify/lib/access-token.ts";
+import { codeMatches, createToken, parseCodes, readCookie, signingSecret, verifyToken } from "../netlify/lib/access-token.ts";
 import { BOOKING_RULES, bookableRange, slotError, todayIn } from "../netlify/lib/booking-rules.ts";
 
 test("attendee code is case and space insensitive", () => {
   assert.ok(codeMatches(" starpower ", "STARPOWER"));
   assert.ok(!codeMatches("STARPOWE", "STARPOWER"));
   assert.ok(!codeMatches("", "STARPOWER"));
+});
+
+test("TOOLKIT_CODE with one code", () => {
+  assert.ok(codeMatches("STARPOWER", "STARPOWER"));
+  assert.ok(codeMatches("starpower", "STARPOWER"));
+});
+
+test("TOOLKIT_CODE with several codes accepts any entry", () => {
+  const list = "RESET2026,RDTraining2026,STARPOWER";
+  assert.ok(codeMatches("RESET2026", list));
+  assert.ok(codeMatches("rdtraining2026", list));
+  assert.ok(codeMatches(" StarPower ", list));
+  assert.deepEqual(parseCodes(list), ["RESET2026", "RDTRAINING2026", "STARPOWER"]);
+});
+
+test("TOOLKIT_CODE tolerates spaces around commas and empty entries", () => {
+  const list = " RESET2026 , RDTraining2026 ,, STARPOWER ";
+  assert.ok(codeMatches("RESET2026", list));
+  assert.ok(codeMatches("RDTRAINING2026", list));
+  assert.ok(codeMatches("starpower", list));
+  assert.ok(!codeMatches("", list));
+  assert.ok(!codeMatches(",", list));
+});
+
+test("TOOLKIT_CODE rejects a wrong code", () => {
+  const list = "RESET2026,RDTraining2026,STARPOWER";
+  assert.ok(!codeMatches("RESET2025", list));
+  assert.ok(!codeMatches("RESET2026,STARPOWER", list));
+  assert.ok(!codeMatches("STAR", list));
+  assert.ok(!codeMatches("WRONG", "STARPOWER"));
+});
+
+test("signing secret fallback uses the full TOOLKIT_CODE string", () => {
+  assert.equal(signingSecret(undefined, "STARPOWER"), "ltf-fallback:STARPOWER");
+  assert.equal(signingSecret(undefined, "RESET2026,STARPOWER"), "ltf-fallback:RESET2026,STARPOWER");
 });
 
 test("access token round trip, tamper, expiry, wrong secret", async () => {

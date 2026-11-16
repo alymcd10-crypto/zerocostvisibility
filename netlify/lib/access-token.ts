@@ -10,7 +10,7 @@ export const DEFAULT_CODE = "STARPOWER";
 const enc = new TextEncoder();
 
 // TOOLKIT_SECRET should be set in Netlify. Without it, the secret falls back to one derived
-// from the code, so changing the code still logs everyone out and the gate never fails open.
+// from the full TOOLKIT_CODE string (the whole list, unchanged), so changing the code still logs everyone out and the gate never fails open.
 export function signingSecret(secret: string | undefined, code: string): string {
   return secret && secret.length >= 16 ? secret : `ltf-fallback:${code}`;
 }
@@ -34,8 +34,19 @@ function safeEqual(a: string, b: string): boolean {
   return diff === 0;
 }
 
+// TOOLKIT_CODE may hold several codes separated by commas (e.g. "RESET2026,RDTraining2026,STARPOWER").
+// Each entry is trimmed and compared without regard to case; empty entries are ignored.
+export function parseCodes(codes: string): string[] {
+  return codes.split(",").map(normalizeCode).filter(Boolean);
+}
+
 export function codeMatches(given: string, expected: string): boolean {
-  return safeEqual(normalizeCode(given), normalizeCode(expected));
+  const g = normalizeCode(given);
+  if (!g) return false;
+  // Check every entry (no early exit) so the response time doesn't hint at which one matched.
+  let ok = false;
+  for (const code of parseCodes(expected)) ok = safeEqual(g, code) || ok;
+  return ok;
 }
 
 export async function createToken(secret: string, now = Date.now()): Promise<string> {

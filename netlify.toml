@@ -90,6 +90,11 @@
   status = 302
 
 [[redirects]]
+  from = "/reset"
+  to = "/toolkit/?utm_source=rd-training&utm_medium=qr&utm_campaign=reset2026&utm_content=closing-slide"
+  status = 302
+
+[[redirects]]
   from = "/reviews"
   to = "/toolkit/?utm_source=starpower&utm_medium=qr&utm_campaign=starpower2026&utm_content=slide14#step3"
   status = 302
