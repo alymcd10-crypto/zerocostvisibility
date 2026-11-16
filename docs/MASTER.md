@@ -1,5 +1,25 @@
 # Liz Turnbaugh Federman: Talk, Toolkit and Site
 
+# Update, 16 November 2026
+
+This section supersedes anything below that disagrees with it.
+
+- **Talk renamed:** "The Client-Driven Visibility System" (deck v8, now v9). Starpower and "Booked Solid" are gone from the deck.
+- **Domain:** clientdrivenvisibility.com, registered at Netlify and set as the primary domain. The old zerocostvisibility.netlify.app address keeps working.
+- **Live site:** Phase 1, merged 16 November. Phase 2 (the Visibility Setup) is retired from the public site.
+- **Attendee code:** RESET2026 on the slides. RESET2026, RDTraining2026 and STARPOWER all unlock, whatever the Netlify setting says. To add a code for a future event, set `TOOLKIT_CODE` in Netlify.
+- **Numbers on the site:** $379K to $46.5M, 120+ reviews, 72% of 2026 business from relationships, $0 spent buying leads.
+- **Deck v9 changes from v8:** code RESET2026 on slides 25, 30, 31 and in the notes; clientdrivenvisibility.com on slides 30 and 31; new QR codes (slide 25 opens `/reviews`, slide 30 opens `/reset`), both checked by decoding; slide 8 changed from 75% / 25% to 72% / 28% to match "2026 YTD".
+- **Toolkit:** now holds every worksheet and prompt the v8 appendix promises: group scorecard, Day 5 and Day 10 follow-ups, Day 14 stop, review tracker (with a blank CSV), client draft-polish prompt, 30-day reuse schedule, "Be everywhere they look", listing rewrite prompt, and the sixteen-question self-score. The slide-by-slide gaps listed in section 3 below are closed.
+- **Review request** in the toolkit now matches v8 ("Hi friends…"), which drops "If you were happy" and the suggested phrases, so the Google review-policy concern in section 8 is resolved.
+
+**Still only the account owner can do (Netlify dashboard):**
+1. Forms: enable form detection, then add an email notification. Until then contact messages reach no one.
+2. Optional: set `TOOLKIT_SECRET` to a long random value.
+
+**Still open with Liz:** the date behind $46.5M (the hero footnote has no date), and whether 75% belongs anywhere as a 2025 figure.
+
+
 Master document. Written 10 November 2026. It covers the talk, the website, the offer, and what is still open, in the order the presentation runs.
 
 ## 1. Where things stand
