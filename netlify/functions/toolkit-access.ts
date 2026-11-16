@@ -9,7 +9,7 @@ const json = (body: unknown, status = 200, headers: Record<string, string> = {})
   Response.json(body, { status, headers: { "Cache-Control": "no-store", ...headers } });
 
 // POST /api/toolkit-access { email, code, source } → sets the signed attendee cookie.
-// The attendee code is set in Netlify (TOOLKIT_CODE); the code in the page is never trusted.
+// The attendee codes are set in Netlify (TOOLKIT_CODE, comma-separated); the code in the page is never trusted.
 export default async (req: Request) => {
   if (req.method !== "POST") return json({ error: "Method not allowed" }, 405);
 
@@ -25,6 +25,8 @@ export default async (req: Request) => {
   const email = s("email").slice(0, 200).toLowerCase();
   if (!EMAIL.test(email)) return json({ error: "Please enter a valid email." }, 400);
 
+  // Any entry in the list unlocks. The signing secret below uses the full string, so a single
+  // code behaves exactly as before and the edge gate (which reads the same string) agrees.
   const code = Netlify.env.get("TOOLKIT_CODE") || DEFAULT_CODE;
   if (!codeMatches(s("code"), code)) {
     return json({ error: "That code doesn't match. It's on Liz's closing slide." }, 401);

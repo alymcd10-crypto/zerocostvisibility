@@ -5,7 +5,7 @@
   var CONTACT_EMAIL = 'liz@listingsbyleslie.com';
 
   // Forms and analytics only run on the real site (or when the end-to-end test sets __SITE_LIVE__)
-  var isLive = window.__SITE_LIVE__ === true || /(^|\.)zerocostvisibility\.com$|netlify\.app$/.test(location.hostname);
+  var isLive = window.__SITE_LIVE__ === true || /(^|\.)(clientdrivenvisibility|lizfederman|lizturnbaughfederman)\.com$|netlify\.app$/.test(location.hostname);
   var reduceMotion = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
   var params = new URLSearchParams(location.search);
 
@@ -192,7 +192,7 @@
   if (contact) {
     // /book?topic=setup#contact (or #contact?topic=setup) preselects the Setup topic
     var topic = params.get('topic') || new URLSearchParams(location.hash.split('?')[1] || '').get('topic');
-    var topics = { setup: 'The Visibility Setup' };
+    var topics = { setup: 'The Visibility Setup', speaking: 'Speaking at my event' };
     if (topic && topics[topic]) contact.elements['topic'].value = topics[topic];
     if (/^#contact\?/.test(location.hash)) {
       var contactSection = document.getElementById('contact');
