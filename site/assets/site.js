@@ -5,7 +5,7 @@
   var CONTACT_EMAIL = 'liz@listingsbyleslie.com';
 
   // Forms and analytics only run on the real site (or when the end-to-end test sets __SITE_LIVE__)
-  var isLive = window.__SITE_LIVE__ === true || /(^|\.)zerocostvisibility\.com$|netlify\.app$/.test(location.hostname);
+  var isLive = window.__SITE_LIVE__ === true || /(^|\.)(clientdrivenvisibility|lizfederman|lizturnbaughfederman)\.com$|netlify\.app$/.test(location.hostname);
   var reduceMotion = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
   var params = new URLSearchParams(location.search);
 

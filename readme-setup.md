@@ -1,4 +1,4 @@
-# zerocostvisibility.com: setup and launch checklist
+# clientdrivenvisibility.com: setup and launch checklist
 
 The pages live in `site/` (plain HTML). On every deploy, `scripts/build.mjs` copies them to `dist/` and fills in the site address (see **Site address** below). Server code lives in `netlify/`:
 - `functions/bookings.ts`: the built-in booking calendar.
@@ -35,14 +35,11 @@ This branch is **Phase 1**: the site offers only the 1:1 session with Liz. The V
 4. **Domain (later).** See **Site address and domains** below.
 
 ## Site address and domains
-The site's address is set in one place: `siteUrl` in `site.config.json`, currently `https://zerocostvisibility.netlify.app`. The build fills it into every canonical link, Open Graph tag, the JSON-LD business details, `sitemap.xml` and `robots.txt` (written as `{{SITE_URL}}` in the files under `site/`).
+The site's address is set in one place: `siteUrl` in `site.config.json`, currently `https://clientdrivenvisibility.com`. The build fills it into every canonical link, Open Graph tag, the JSON-LD business details, `sitemap.xml` and `robots.txt` (written as `{{SITE_URL}}` in the files under `site/`).
 
-**Switching to zerocostvisibility.com:**
-1. Netlify > Domain management > add `zerocostvisibility.com` and make it the **primary domain**.
-2. Change `siteUrl` in `site.config.json` to `https://zerocostvisibility.com` (one line) and push.
-3. Add the new domain to the GA4 data stream and to Search Console, and resubmit `sitemap.xml`.
+**The domain:** `clientdrivenvisibility.com` is registered at Netlify and set as the primary domain. The old `zerocostvisibility.netlify.app` address keeps working and forwards to it. Do not rename the Netlify project: that would change the netlify.app address that older QR codes use.
 
-**Extra domains:** `netlify.toml` already forwards `lizturnbaughfederman.com`, `lizfederman.com` (with and without `www`) and `www.zerocostvisibility.com` to `https://zerocostvisibility.com` with a 301. These rules do nothing until each domain is added under Domain management > **Add a domain alias**, so buy and attach them whenever you're ready.
+**Extra domains:** `netlify.toml` already forwards `lizturnbaughfederman.com`, `lizfederman.com` (with and without `www`) and `www.clientdrivenvisibility.com` to `https://zerocostvisibility.com` with a 301. These rules do nothing until each domain is added under Domain management > **Add a domain alias**, so buy and attach them whenever you're ready.
 
 ## Booking: Cal.com with Google Calendar and Google Meet (recommended)
 `site/assets/config.js` is already set to Cal.com. Until its link is pasted in, the Book page falls back to the built-in calendar.
@@ -62,7 +59,7 @@ The site's address is set in one place: `siteUrl` in `site.config.json`, current
 - **Calendly** (`bookingProvider: 'calendly'`, `bookingUrl: 'https://calendly.com/…'`): taking payment at booking needs Calendly Standard ($10/mo).
 
 ## Google Analytics 4 and Search Console
-1. **GA4:** analytics.google.com > Admin > Create property > Web data stream for zerocostvisibility.com. Copy the measurement ID (`G-…`) into `ga4Id` in `site/assets/config.js`. Tracking only runs on the live site.
+1. **GA4:** analytics.google.com > Admin > Create property > Web data stream for clientdrivenvisibility.com. Copy the measurement ID (`G-…`) into `ga4Id` in `site/assets/config.js`. Tracking only runs on the live site.
 2. **Key events:** in GA4 > Admin > Data display > Events, turn on **Mark as key event** for `generate_lead` (booking or contact form sent; contact forms carry the `topic`, so Setup inquiries show up as `topic = The Visibility Setup`), `toolkit_unlock` (attendee entered the code) and `booking_time_selected` (a visitor picked a time). Note: Cal.com's embed doesn't report a time being picked, so with Cal.com `booking_time_selected` stays at zero, and finished Cal.com bookings arrive as `generate_lead` with `method = cal`.
 3. **Events the site sends:**
 
