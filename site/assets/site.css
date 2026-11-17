@@ -39,7 +39,7 @@ p{margin:0}
 .badge{display:inline-block;align-self:flex-start;font:600 10.5px var(--sans);letter-spacing:1.5px;text-transform:uppercase;color:var(--white);background:var(--rose);padding:5px 12px;border-radius:999px}
 .text-link{font-size:14px;text-underline-offset:4px;display:inline-block;padding-block:10px}
 /* Inline links inside notes and small print stay easy to tap */
-.form-note a,.booking-fallback a{display:inline-block;padding-block:8px}
+.form-note a/*{{#live}}*/,.booking-fallback a/*{{/live}}*/{display:inline-block;padding-block:8px}
 .sr-only{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0);white-space:nowrap}
 .sr-only:focus{position:static;width:auto;height:auto;clip:auto;padding:8px 24px;display:block}
 
@@ -74,9 +74,9 @@ p{margin:0}
 .row{display:flex;flex-wrap:wrap;align-items:center;gap:20px 28px;background:var(--white);border:1px solid var(--line);padding:14px 28px 14px 14px;text-decoration:none;color:inherit}
 .row-media{width:180px;height:132px;flex-shrink:0;background:var(--sand);display:flex;align-items:center;justify-content:center;overflow:hidden}
 .row-media img{width:100%;height:100%;object-fit:cover}
-.row-media .photo-session{object-position:50% 0}
+/*{{#live}}*/.row-media .photo-session{object-position:50% 0}
 @media (max-width:640px){.row-media:has(.photo-session){height:auto;aspect-ratio:4/3}}
-.row.featured{background:var(--blush);border-color:var(--pink)}
+/*{{/live}}*/.row.featured{background:var(--blush);border-color:var(--pink)}
 .row.featured .row-media{background:var(--white)}
 .row-copy{flex:1 1 240px;min-width:0;display:flex;flex-direction:column;gap:6px}
 .row-copy h2,.row-copy h3{font-size:27px;line-height:1.15;font-weight:600}
@@ -150,7 +150,7 @@ p{margin:0}
 .form-note{font-size:13px;color:var(--muted)}
 .success{background:var(--blush);border-left:2px solid var(--pink);padding:20px 24px}
 
-/* Setup page */
+/*{{#live}}*//* Setup page */
 .page-hero{display:flex;flex-direction:column;gap:20px;padding-block:72px 56px;max-width:860px}
 .included{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:16px;margin:0;padding:0;list-style:none}
 .included li{background:var(--white);border:1px solid var(--line);border-top:3px solid var(--pink);padding:24px;display:flex;flex-direction:column;gap:8px}
@@ -162,7 +162,7 @@ p{margin:0}
 .price-block .price{font-family:var(--display);font-size:clamp(48px,6vw,72px);font-weight:600;line-height:1;color:var(--ink)}
 .price-block p{max-width:38em}
 @media (max-width:560px){.price-block{padding:28px 22px}}
-.faq{display:flex;flex-direction:column;border-top:1px solid var(--line);max-width:860px}
+/*{{/live}}*/.faq{display:flex;flex-direction:column;border-top:1px solid var(--line);max-width:860px}
 .faq details{border-bottom:1px solid var(--line)}
 .faq summary{cursor:pointer;list-style:none;display:flex;justify-content:space-between;gap:16px;padding:20px 0;font-family:var(--display);font-size:23px;font-weight:600;color:var(--ink)}
 .faq summary::-webkit-details-marker{display:none}
@@ -252,7 +252,7 @@ p{margin:0}
 .timeline p{grid-column:2;font-size:15px}
 @media (max-width:560px){.timeline li{grid-template-columns:1fr}.timeline p{grid-column:1}}
 
-/* Book page */
+/*{{#live}}*//* Book page */
 .book .wrap{padding-block:56px 72px;display:flex;flex-wrap:wrap;gap:48px;align-items:flex-start}
 .book-copy{flex:1 1 420px;min-width:0;display:flex;flex-direction:column;gap:22px}
 /* Speaking: partner copy on the left, a short event list on the right */
@@ -260,15 +260,20 @@ p{margin:0}
 .speaking-copy{flex:1 1 380px;display:flex;flex-direction:column;gap:18px;max-width:34em}
 .speaking-copy p a{color:var(--ink);text-underline-offset:4px}
 .speaking .actions{display:flex;flex-wrap:wrap;align-items:center;gap:8px 24px}
-.events{flex:1 1 360px;margin:0;padding:0;list-style:none;border-top:1px solid var(--line)}
+/*{{/live}}*//*{{#private}}*//* Training dates: partner copy on the left, a short event list on the right */
+.live-events{display:flex;flex-wrap:wrap;gap:40px 64px;align-items:flex-start}
+.live-events-copy{flex:1 1 380px;display:flex;flex-direction:column;gap:18px;max-width:34em}
+.live-events-copy p a{color:var(--ink);text-underline-offset:4px}
+.live-events .actions{display:flex;flex-wrap:wrap;align-items:center;gap:8px 24px}
+/*{{/private}}*/.events{flex:1 1 360px;margin:0;padding:0;list-style:none;border-top:1px solid var(--line)}
 .events li{display:flex;gap:20px;align-items:flex-start;padding:18px 0;border-bottom:1px solid var(--line)}
 .event-date{flex:0 0 72px;display:flex;flex-direction:column;font-size:13px;color:var(--muted)}
 .event-date strong{font-family:var(--display);font-size:28px;line-height:1;color:var(--ink);font-weight:600}
 .event-copy{display:flex;flex-direction:column;gap:4px;font-size:15px;color:var(--muted)}
 .event-copy b{font-weight:600;color:var(--ink)}
-.event-more .event-date strong{color:var(--gold-text)}
-
-/* Text column for the Book page's fit and proof sections */
+/*{{#live}}*/.event-more .event-date strong{color:var(--gold-text)}
+/*{{/live}}*/
+/*{{#live}}*//* Text column for the Book page's fit and proof sections */
 .stack{max-width:860px;display:flex;flex-direction:column;gap:18px}
 .covers-list{margin:0;padding:0;list-style:none;border-top:1px solid var(--line)}
 .covers-list li{padding:14px 0;border-bottom:1px solid var(--line)}
@@ -306,7 +311,7 @@ button.cal-day[aria-pressed="true"]{background:var(--navy);color:var(--paper)}
 .booking-form .full{grid-column:1 / -1}
 .booking-pick{font-size:15px;color:var(--ink)}
 .booking-embed:not(:empty){min-height:120px}
-.contact{background:var(--cream);border-top:1px solid var(--line)}
+/*{{/live}}*/.contact{background:var(--cream);border-top:1px solid var(--line)}
 .contact .wrap{padding-block:64px;display:flex;flex-wrap:wrap;gap:48px}
 .contact-copy{flex:1 1 300px;min-width:0;display:flex;flex-direction:column;gap:14px}
 .contact-form{flex:999 1 500px;min-width:0;display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:16px;margin:0}

@@ -1,6 +1,6 @@
 (function () {
-  // Settings live in assets/config.js (GA4 ID, booking provider). Booking rules for the
-  // built-in calendar live in netlify/lib/booking-rules.ts and arrive from /api/bookings.
+  // Settings live in assets/config.js (GA4 ID/*{{#live}}*/, booking provider). Booking rules for the
+  // built-in calendar live in netlify/lib/booking-rules.ts and arrive from /api/bookings/*{{/live}}*//*{{#private}}*/)/*{{/private}}*/.
   var CONFIG = window.SITE_CONFIG || {};
   var CONTACT_EMAIL = 'liz@listingsbyleslie.com';
 
@@ -174,7 +174,7 @@
   }
 
   // ---- Events for sections seen on screen: <div data-track-view="event_name"> ----
-  // Fires once per page view, e.g. view_setup_pricing on /setup.
+  // Fires once per page view/*{{#live}}*/, e.g. view_setup_pricing on /setup/*{{/live}}*/.
   var viewed = document.querySelectorAll('[data-track-view]');
   if (viewed.length && 'IntersectionObserver' in window) {
     var seen = new IntersectionObserver(function (entries) {
@@ -190,7 +190,7 @@
   // ---- Contact form ---------------------------------------------------------
   var contact = document.getElementById('contact-form');
   if (contact) {
-    // /book?topic=setup#contact (or #contact?topic=setup) preselects the Setup topic
+/*{{#live}}*/    // /book?topic=setup#contact (or #contact?topic=setup) preselects the Setup topic
     var topic = params.get('topic') || new URLSearchParams(location.hash.split('?')[1] || '').get('topic');
     var topics = { setup: 'The Visibility Setup', speaking: 'Speaking at my event' };
     if (topic && topics[topic]) contact.elements['topic'].value = topics[topic];
@@ -198,7 +198,7 @@
       var contactSection = document.getElementById('contact');
       if (contactSection) requestAnimationFrame(function () { contactSection.scrollIntoView({ block: 'start' }); });
     }
-    contact.addEventListener('submit', function (e) {
+/*{{/live}}*/    contact.addEventListener('submit', function (e) {
       e.preventDefault();
       var msg = document.getElementById('contact-status');
       var btn = contact.querySelector('button[type="submit"]');
@@ -217,7 +217,7 @@
       });
     });
   }
-
+/*{{#live}}*/
   // ---- Booking: Calendly, Cal.com, or the built-in calendar --------------------
   var embedBox = document.getElementById('booking-embed');
   var booker = document.getElementById('booker');
@@ -452,4 +452,4 @@
       status.innerHTML = 'The calendar didn’t load. <a href="#contact">Send a note</a> with a few days and times that work, and Liz will reply within two business days.';
     });
   }
-})();
+/*{{/live}}*/})();
