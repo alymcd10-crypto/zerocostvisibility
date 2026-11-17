@@ -33,7 +33,7 @@ export default async (req: Request) => {
     return json({ error: `That's the right code. The toolkit opens on ${result.opensLabel}.` }, 403);
   }
   if (!result.ok) {
-    return json({ error: "That code doesn't match. It's on Liz's closing slide." }, 401);
+    return json({ error: "That code doesn't match. It's on the review slide and the closing slide." }, 401);
   }
 
   try {

@@ -1,6 +1,6 @@
 import { test } from "node:test";
 import assert from "node:assert/strict";
-import { checkCode, codeMatches, createToken, parseCodes, readCookie, signingSecret, verifyToken } from "../netlify/lib/access-token.ts";
+import { EVENT_CODES, checkCode, codeMatches, createToken, parseCodes, readCookie, signingSecret, verifyToken } from "../netlify/lib/access-token.ts";
 import { BOOKING_RULES, bookableRange, slotError, todayIn } from "../netlify/lib/booking-rules.ts";
 
 test("attendee code is case and space insensitive", () => {
@@ -115,4 +115,16 @@ test("TOOLKIT_CODE codes work at any time, for testing", () => {
 test("wrong codes are refused without a date hint", () => {
   assert.deepEqual(checkCode("RESET2025", "STARPOWER"), { ok: false });
   assert.deepEqual(checkCode("", "STARPOWER"), { ok: false });
+});
+
+test("the deck's event code forgives spaces, hyphens, case and O for zero", () => {
+  const code = EVENT_CODES[0].code; // never written out here
+  const opened = Date.parse(EVENT_CODES[0].opens) + 1000;
+  const spaced = code.replace(/(\D+)(\d+)/, "$1 $2").toLowerCase();
+  const hyphen = code.replace(/(\D+)(\d+)/, "$1-$2");
+  const letterO = code.replace(/0/g, "O");
+  for (const typed of [spaced, hyphen, letterO, ` ${code} `]) {
+    assert.deepEqual(checkCode(typed, "UNRELATED", opened), { ok: true }, typed);
+  }
+  assert.deepEqual(checkCode(code.slice(0, -1), "UNRELATED", opened), { ok: false });
 });

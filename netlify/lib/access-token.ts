@@ -54,18 +54,24 @@ function safeEqual(a: string, b: string): boolean {
   return diff === 0;
 }
 
-// TOOLKIT_CODE may hold several codes separated by commas (e.g. "RESET2026,RDTraining2026,STARPOWER").
+// TOOLKIT_CODE may hold several codes separated by commas (e.g. "CODE1,CODE2").
 // Each entry is trimmed and compared without regard to case; empty entries are ignored.
 export function parseCodes(codes: string): string[] {
   return codes.split(",").map(normalizeCode).filter(Boolean);
 }
 
+// What is compared: forgives spaces, hyphens and dashes anywhere, letter case, and the
+// letter O typed for a zero (and the other way round).
+export function matchKey(code: string): string {
+  return normalizeCode(code).replace(/[\s\-\u2010-\u2015]/g, "").replace(/O/g, "0");
+}
+
 export function codeMatches(given: string, expected: string): boolean {
-  const g = normalizeCode(given);
+  const g = matchKey(given);
   if (!g) return false;
   // Check every entry (no early exit) so the response time doesn't hint at which one matched.
   let ok = false;
-  for (const code of parseCodes(expected)) ok = safeEqual(g, code) || ok;
+  for (const code of parseCodes(expected)) ok = safeEqual(g, matchKey(code)) || ok;
   return ok;
 }
 
