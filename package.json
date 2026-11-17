@@ -4,7 +4,10 @@
   "scripts": {
     "build": "node scripts/build.mjs",
     "test": "node --experimental-strip-types --no-warnings --test tests/lib.test.ts",
-    "test:e2e": "node scripts/build.mjs && (node --experimental-strip-types --no-warnings tests/dev-server.ts 8888 >/dev/null 2>&1 & SERVER=$!; sleep 1; node tests/e2e.mjs; CODE=$?; kill $SERVER; exit $CODE)"
+    "test:e2e": "npm run test:e2e:live && npm run test:e2e:private",
+    "test:e2e:live": "export OFFERS_LIVE=true; node scripts/build.mjs && (node --experimental-strip-types --no-warnings tests/dev-server.ts ${PORT:-8888} >/dev/null 2>&1 & SERVER=$!; sleep 1; PORT=${PORT:-8888} node tests/e2e.mjs; CODE=$?; kill $SERVER; exit $CODE)",
+    "test:e2e:private": "export OFFERS_LIVE=false; node scripts/build.mjs && (node --experimental-strip-types --no-warnings tests/dev-server.ts ${PORT:-8889} >/dev/null 2>&1 & SERVER=$!; sleep 1; PORT=${PORT:-8889} node --experimental-strip-types --no-warnings tests/e2e-private.mjs; CODE=$?; kill $SERVER; exit $CODE)",
+    "scan:private": "node scripts/scan-private.mjs"
   },
   "type": "module",
   "private": true,

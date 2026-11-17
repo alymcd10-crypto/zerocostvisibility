@@ -12,6 +12,22 @@ Data lives in Netlify Database. Its tables are created and updated automatically
 ## Phase 1 and Phase 2
 This branch is **Phase 1**: the site offers only the 1:1 session with Liz. The Visibility Setup page is saved in `phase2/setup.html` (not published), and `/setup` forwards to `/book`. The full version with the Setup is what's on `main` today; to bring it back, restore `phase2/setup.html` to `site/`, re-add the Setup card, menu link, contact topic, credit line and JSON-LD offer, and remove the `/setup` redirect in `netlify.toml`.
 
+## OFFERS_LIVE: private mode or the full site
+One environment variable in Netlify decides which site is built: Project configuration > Environment variables > `OFFERS_LIVE`.
+
+| `OFFERS_LIVE` | What visitors get |
+|---|---|
+| not set, `false`, or anything else | **Private mode.** The menu is only "Attendee toolkit" and "Contact". The session, its price, booking and speaking are cut out of the files at build time, not hidden with styling. `/book` (also `/book?topic=speaking`) forwards to `/contact` with a 302; `/setup` and `/api/bookings` return the 404 page. The sitemap lists only `/` and `/contact`, and `robots.txt` adds `Disallow: /book`. |
+| `true` | **The full site**, exactly as before: Book page, price, calendar, speaking. |
+
+Only the exact word `true` (any capitals) turns the offers on, so a typo or a missing variable hides them rather than showing them.
+
+- **Keep the variable's scopes at "All".** The build reads it to decide what goes into the pages, and the server code reads it to decide what `/book`, `/setup` and `/api/bookings` do. If the scope is limited to Builds or to Functions, the two halves disagree. Give it the same value in every deploy context, unless you want Deploy Previews to differ from the live site on purpose.
+- **Redeploy after any change.** The variable only takes effect on a new deploy: Deploys > Trigger deploy > Deploy project. Until then the site stays as it was last built.
+- The attendee toolkit, its code, the short links (`/starpower`, `/rd`, `/reset`, `/reviews`) and analytics work the same in both modes.
+- Every private build is searched for offer words (`scripts/scan-private.mjs`) and fails if one turns up that isn't on the reviewed list in that file, so a deploy with a stray price never goes out. `npm run scan:private` lists every hit and why it is allowed.
+- In the files under `site/`, text between `{{#live}}` and `{{/live}}` is built only for the full site, and text between `{{#private}}` and `{{/private}}` only in private mode. `site/book.html` is left out of private builds; `site/contact.html` and `site/404.html` are left out of the full site.
+
 ## Pages
 | URL | What it is |
 |---|---|
@@ -92,7 +108,7 @@ Netlify > Database > `toolkit_access` lists every email that entered the right c
 - In GA4 > Reports > Realtime, check that your own visit and events show up.
 
 ## Automated checks
-`npm run build` builds `dist/`. `npm test` runs the unit tests. `npm run test:e2e` builds, then starts a local stand-in for Netlify and clicks every link, tab, copy button and form in Chromium. It also checks phone layout, accessibility, the palette, the copy rules (no em dashes or banned words, nothing from the gated toolkit on public pages) and the Cal.com fallback. Playwright must be installed (`npm i -D playwright`, or a global install with `NODE_PATH=$(npm root -g)`).
+`npm run build` builds `dist/`. `npm test` runs the unit tests. `npm run test:e2e` runs two suites, one per `OFFERS_LIVE` setting: `npm run test:e2e:live` (full site, local server on port 8888, `tests/e2e.mjs`) and `npm run test:e2e:private` (private mode, port 8889, `tests/e2e-private.mjs`). If a port is taken, set another one, for example `PORT=8890 npm run test:e2e:live`. Each one builds, then starts a local stand-in for Netlify and clicks every link, tab, copy button and form in Chromium. It also checks phone layout, accessibility, the palette, the copy rules (no em dashes or banned words, nothing from the gated toolkit on public pages) and the Cal.com fallback. The private suite checks that the menu, `/book`, `/setup`, `/api/bookings`, the sitemap, `robots.txt`, the JSON-LD and the unlocked toolkit carry no offer, and that the Contact form sends. Playwright must be installed (`npm i -D playwright`, or a global install with `NODE_PATH=$(npm root -g)`).
 
 ## Notes
 - Founding price on the Book page says $297 for the first 10 sessions, then $397. Edit `site/book.html` if that changes.

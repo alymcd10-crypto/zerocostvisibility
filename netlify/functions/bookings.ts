@@ -3,6 +3,7 @@ import { and, gte, lte, ne, sql } from "drizzle-orm";
 import { db } from "../../db/index.js";
 import { bookings } from "../../db/schema.js";
 import { BOOKING_RULES, bookableRange, slotError, todayIn } from "../lib/booking-rules.js";
+import { offersLive } from "../lib/offers-mode.mjs";
 
 const EMAIL = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
@@ -33,6 +34,9 @@ async function notify(origin: string, fields: Record<string, string>): Promise<b
 }
 
 export default async (req: Request) => {
+  // Private mode: there is no booking, so this address doesn't exist (see netlify/lib/offers-mode.mjs).
+  if (!offersLive(Netlify.env.get("OFFERS_LIVE"))) return new Response("Not found", { status: 404, headers: { "Cache-Control": "no-store" } });
+
   const rules = BOOKING_RULES;
 
   // GET /api/bookings → the calendar rules and the taken slots in range. Never names or emails.

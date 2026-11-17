@@ -1,6 +1,8 @@
 // Local stand-in for Netlify, for the end-to-end test: static files with pretty URLs,
-// the redirects in netlify.toml, the toolkit gate, both APIs (in memory, same rules) and
-// Netlify Forms. Run: node --experimental-strip-types tests/dev-server.ts [port]
+// the redirects in netlify.toml, the toolkit gate, the private-mode /book and /setup handling
+// (netlify/edge-functions/offers-gate.ts), both APIs (in memory, same rules), the 404 page and
+// Netlify Forms. Run: OFFERS_LIVE=true|false node --experimental-strip-types tests/dev-server.ts [port]
+// with the same OFFERS_LIVE the site was built with.
 import { createServer } from "node:http";
 import { readFile, stat } from "node:fs/promises";
 import { extname, join, normalize } from "node:path";
@@ -8,11 +10,13 @@ import {
   DEFAULT_CODE, checkCode, codeMatches, cookieHeader, createToken, readCookie, signingSecret, verifyToken,
 } from "../netlify/lib/access-token.ts";
 import { BOOKING_RULES, bookableRange, slotError } from "../netlify/lib/booking-rules.ts";
+import { offersLive } from "../netlify/lib/offers-mode.mjs";
 
 // Serves the built site (npm run build) so {{SITE_URL}} is filled in as on Netlify.
 const ROOT = new URL("../dist/", import.meta.url).pathname;
 const PORT = Number(process.argv[2] ?? 8888);
 const SECRET = signingSecret(undefined, DEFAULT_CODE);
+const LIVE = offersLive(process.env.OFFERS_LIVE);
 const TYPES: Record<string, string> = {
   ".html": "text/html; charset=utf-8", ".css": "text/css", ".js": "text/javascript", ".svg": "image/svg+xml",
   ".png": "image/png", ".jpg": "image/jpeg", ".ico": "image/x-icon", ".xml": "application/xml", ".txt": "text/plain",
@@ -56,6 +60,22 @@ createServer(async (req, res) => {
     return send(200, { ok: true }, { "Set-Cookie": cookieHeader(await createToken(SECRET)).replace("; Secure", "") });
   }
 
+  const notFound = async () => {
+    const page = await file("/404.html");
+    res.writeHead(404, { "Content-Type": page ? TYPES[".html"] : "text/plain" });
+    return res.end(page ? await readFile(page) : "Not found");
+  };
+
+  // Private mode, as netlify/edge-functions/offers-gate.ts and the bookings function do it
+  if (!LIVE) {
+    const p = url.pathname;
+    if (p === "/book" || p === "/book.html" || p.startsWith("/book/")) {
+      res.writeHead(302, { Location: "/contact", "Cache-Control": "no-store" });
+      return res.end();
+    }
+    if (p === "/setup" || p === "/setup.html" || p.startsWith("/setup/") || p === "/api/bookings") return notFound();
+  }
+
   if (url.pathname === "/api/bookings") {
     const active = bookings.filter((b) => b.status !== "cancelled");
     if (req.method === "GET") {
@@ -84,7 +104,7 @@ createServer(async (req, res) => {
     if (r) { res.writeHead(r.status, { Location: r.to }); return res.end(); }
   }
   const f = await file(path);
-  if (!f) { res.writeHead(404, { "Content-Type": "text/plain" }); return res.end("Not found"); }
+  if (!f) return notFound();
   res.writeHead(200, { "Content-Type": TYPES[extname(f)] ?? "application/octet-stream", "Cache-Control": "no-store" });
   res.end(await readFile(f));
-}).listen(PORT, () => console.log(`dev server on http://localhost:${PORT}`));
+}).listen(PORT, () => console.log(`dev server on http://localhost:${PORT}, offers ${LIVE ? "live" : "hidden (private mode)"}`));

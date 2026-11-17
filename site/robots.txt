@@ -2,5 +2,6 @@ User-agent: *
 Disallow: /toolkit/
 Disallow: /attendee/
 Disallow: /thanks
-
+{{#private}}Disallow: /book
+{{/private}}
 Sitemap: {{SITE_URL}}/sitemap.xml
