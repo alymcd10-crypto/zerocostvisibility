@@ -161,7 +161,12 @@
       }, { rootMargin: '-120px 0px -60% 0px' });
       Object.keys(byId).forEach(function (id) { var s = document.getElementById(id); if (s) io.observe(s); });
     }
-    // Arriving from the slide 14 QR code (#step3) right after unlocking: land on the section
+    // Arriving from the slide 14 QR code (#step3) right after unlocking: land on the section.
+    // That QR code (/reviews) predates the step order post, review, recommend: its #step3 means
+    // the review request, which is Step 02 now.
+    if (location.hash === '#step3' && params.get('utm_content') === 'slide14') {
+      try { history.replaceState(null, '', location.pathname + location.search + '#step2'); } catch (e3) {}
+    }
     if (location.hash) {
       var target = document.getElementById(decodeURIComponent(location.hash.slice(1)));
       var jump = function () { target.scrollIntoView({ block: 'start', behavior: 'instant' }); };

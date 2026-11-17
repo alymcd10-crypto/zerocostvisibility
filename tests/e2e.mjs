@@ -59,13 +59,13 @@ await step('the event code before its opening date says when the toolkit opens',
   assert.match(await page.locator('#gate-error').innerText(), /opens on December 15/);
 });
 
-await step('right code (lower case) unlocks and lands on the review request (#step3)', async () => {
+await step('right code (lower case) unlocks and lands on the review request (now #step2)', async () => {
   await page.fill('#gate-code', ' starpower ');
-  await Promise.all([page.waitForURL(/#step3$/), page.waitForLoadState('load'), page.click('#gate-form button[type=submit]')]);
+  await Promise.all([page.waitForURL(/#step2$/), page.waitForLoadState('load'), page.click('#gate-form button[type=submit]')]);
   await page.locator('#tpl-review').waitFor();
   await page.waitForTimeout(400);
-  const top = await page.locator('#step3').evaluate((el) => el.getBoundingClientRect().top);
-  assert.ok(top > -5 && top < 200, `#step3 top at ${top}`);
+  const top = await page.locator('#step2').evaluate((el) => el.getBoundingClientRect().top);
+  assert.ok(top > -5 && top < 200, `#step2 top at ${top}`);
   const s = await state();
   assert.ok(s.forms.some((f) => f['form-name'] === 'toolkit-access' && f.email === 'agent@example.com'), 'Netlify form submitted');
   assert.deepEqual(s.access.at(-1), { email: 'agent@example.com', source: 'slide14' });

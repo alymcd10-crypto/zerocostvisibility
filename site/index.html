@@ -18,18 +18,16 @@
 <link rel="icon" href="/favicon.ico" sizes="32x32">
 <link rel="apple-touch-icon" href="/apple-touch-icon.png">
 <meta name="theme-color" content="#1C2536">
-<!-- Google Search Console: on netlify.app, paste the
-     <meta name="google-site-verification" content="..."> tag from Search Console here
-     (URL prefix property). Once you own a domain, verify with a DNS TXT record instead. -->
+<!-- Google Search Console: verify the domain with a DNS TXT record. -->
 <link rel="stylesheet" href="/assets/site.css">
 <script type="application/ld+json">
 {"@context":"https://schema.org","@graph":[
- {"@type":"Person","@id":"{{SITE_URL}}/#liz","name":"Liz Turnbaugh Federman","jobTitle":"Real estate broker and visibility strategist","image":"{{SITE_URL}}/assets/img/hero-liz.jpg","url":"{{SITE_URL}}/","telephone":"+1-847-343-1002","email":"liz@listingsbyleslie.com","worksFor":{"@type":"RealEstateAgent","name":"The Leslie McDonnell Team, RE/MAX Suburban"},"affiliation":{"@type":"Organization","name":"RD Training Systems","url":"https://rdtrainingsystems.com/"},"performerIn":{"@id":"{{SITE_URL}}/#reset-2026"},"address":{"@type":"PostalAddress","addressLocality":"Libertyville","addressRegion":"IL","addressCountry":"US"}},
+ {"@type":"Person","@id":"{{SITE_URL}}/#liz","name":"Liz Turnbaugh Federman","jobTitle":"Real estate broker and visibility strategist","image":"{{SITE_URL}}/assets/img/hero-liz.jpg","url":"{{SITE_URL}}/","telephone":"+1-847-343-1002","email":"liz@listingsbyleslie.com","worksFor":{"@type":"RealEstateAgent","name":"The Leslie McDonnell Team, RE/MAX Suburban"},"affiliation":{"@type":"Organization","name":"RD Training Systems","url":"https://rdtrainingsystems.com/"},"performerIn":{"@id":"{{SITE_URL}}/#reset-training"},"address":{"@type":"PostalAddress","addressLocality":"Libertyville","addressRegion":"IL","addressCountry":"US"}},
 {{#live}} {"@type":"ProfessionalService","@id":"{{SITE_URL}}/#service","name":"Visibility strategy with Liz Turnbaugh Federman","url":"{{SITE_URL}}/","description":"Visibility strategy for real estate agents from a top-producing Libertyville broker: more referrals and repeat business with no paid leads.","provider":{"@id":"{{SITE_URL}}/#liz"},"areaServed":"US","telephone":"+1-847-343-1002","address":{"@type":"PostalAddress","addressLocality":"Libertyville","addressRegion":"IL","addressCountry":"US"},
   "makesOffer":[
    {"@type":"Offer","name":"The Client-Driven Visibility Session","description":"60 minutes on Google Meet with Liz. She sets up her Client-Driven Visibility System for your market with you, and you leave with a shared Google Doc and a 30-day checklist.","price":"297","priceCurrency":"USD","url":"{{SITE_URL}}/book"}
   ]},
-{{/live}} {"@type":"EducationEvent","@id":"{{SITE_URL}}/#reset-2026","name":"The REset Executive Training","description":"Two-day live training for real estate agents by RD Training Systems. Liz Turnbaugh Federman teaches the Client-Driven Visibility System.","startDate":"2026-12-15T09:00:00-05:00","endDate":"2026-12-16T16:30:00-05:00","eventAttendanceMode":"https://schema.org/OfflineEventAttendanceMode","eventStatus":"https://schema.org/EventScheduled","location":{"@type":"Place","name":"The Ritz-Carlton, Tysons Corner","address":{"@type":"PostalAddress","streetAddress":"1700 Tysons Boulevard","addressLocality":"McLean","addressRegion":"VA","postalCode":"22102","addressCountry":"US"}},"organizer":{"@type":"Organization","name":"RD Training Systems","url":"https://rdtrainingsystems.com/"},"performer":{"@id":"{{SITE_URL}}/#liz"}}
+{{/live}} {"@type":"EducationEvent","@id":"{{SITE_URL}}/#reset-training","name":"The REset Executive Training","description":"Two-day live training for real estate agents by RD Training Systems. Liz Turnbaugh Federman teaches the Client-Driven Visibility System.","startDate":"2026-12-15T09:00:00-05:00","endDate":"2026-12-16T16:30:00-05:00","eventAttendanceMode":"https://schema.org/OfflineEventAttendanceMode","eventStatus":"https://schema.org/EventScheduled","location":{"@type":"Place","name":"The Ritz-Carlton, Tysons Corner","address":{"@type":"PostalAddress","streetAddress":"1700 Tysons Boulevard","addressLocality":"McLean","addressRegion":"VA","postalCode":"22102","addressCountry":"US"}},"organizer":{"@type":"Organization","name":"RD Training Systems","url":"https://rdtrainingsystems.com/"},"performer":{"@id":"{{SITE_URL}}/#liz"}}
 ]}
 </script>
 </head>
@@ -80,7 +78,7 @@
     </div>
 {{/live}}    <div class="row">
       <div class="row-media"><div class="cover"><span>The Attendee Toolkit</span></div></div>
-      <div class="row-copy"><h3>The attendee toolkit</h3><p>Heard Liz at an RD Training Systems {{#live}}session{{/live}}{{#private}}training{{/private}} or another event? Everything from the talk, written out and ready to use. You'll need the code from the last slide.</p></div>
+      <div class="row-copy"><h3>The attendee toolkit</h3><p>Heard Liz at an RD Training Systems {{#live}}session{{/live}}{{#private}}training{{/private}} or another event? Everything from the talk, written out and ready to use. You'll need the code from the talk's slides.</p></div>
       <a class="btn secondary" href="/toolkit/" data-track="toolkit_cta" data-track-location="options">Open the toolkit <span aria-hidden="true">→</span></a>
     </div>
     <div class="row">

@@ -54,7 +54,7 @@ createServer(async (req, res) => {
     if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(b.email ?? "")) return send(400, { error: "Please enter a valid email." });
     const result = checkCode(b.code ?? "", DEFAULT_CODE);
     if (!result.ok && result.opensLabel) return send(403, { error: `That's the right code. The toolkit opens on ${result.opensLabel}.` });
-    if (!result.ok) return send(401, { error: "That code doesn't match. It's on Liz's closing slide." });
+    if (!result.ok) return send(401, { error: "That code doesn't match. It's on the review slide and the closing slide." });
     access.push({ email: b.email, source: b.source ?? "" });
     // Plain http in the test, so the Secure flag is dropped here only.
     return send(200, { ok: true }, { "Set-Cookie": cookieHeader(await createToken(SECRET)).replace("; Secure", "") });
